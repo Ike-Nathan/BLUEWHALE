@@ -1,0 +1,18 @@
+{
+  "name": "stellar-address-kit-monorepo",
+  "private": true,
+  "description": "Multi-language Stellar address processing and deposit routing kit",
+  "scripts": {
+    "spec:validate": "node spec/validate.js",
+    "spec:sync-check": "node scripts/check-vectors-sync.js",
+    "test": "pnpm spec:validate && pnpm -r test",
+    "test:ts": "pnpm --filter stellar-address-kit test",
+    "test:go": "cd packages/core-go && go test ./...",
+    "test:dart": "cd packages/core-dart && dart test",
+    "fuzz:go": "cd packages/core-go && go test -fuzz=. -fuzztime=300s ./spec/...",
+    "release": "node scripts/release.js"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1"
+  }
+}

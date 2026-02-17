@@ -1,0 +1,16 @@
+name: ci-dart
+
+on:
+  pull_request:
+    paths:
+      - "packages/core-dart/**"
+      - "spec/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - run: cd packages/core-dart && dart pub get
+      - run: cd packages/core-dart && dart test
