@@ -2,11 +2,13 @@ package muxed
 
 import (
 	"encoding/binary"
+	"errors"
 	"math/big"
-	"strconv"
 
 	"github.com/stellar-address-kit/core-go/address"
 )
+
+var maxUint64 = new(big.Int).SetUint64(^uint64(0))
 
 func EncodeMuxed(baseG string, id string) (string, error) {
 	versionByte, pubkey, err := address.DecodeStrKey(baseG)
@@ -15,19 +17,21 @@ func EncodeMuxed(baseG string, id string) (string, error) {
 	}
 
 	if versionByte != address.VersionByteG {
-		return "", strconv.ErrSyntax
+		return "", errors.New("invalid base account address")
 	}
 
-	// Parse the ID as uint64
 	idInt := new(big.Int)
-	idInt.SetString(id, 10)
-	memoID := idInt.Uint64()
+	if _, ok := idInt.SetString(id, 10); !ok {
+		return "", errors.New("invalid muxed account id")
+	}
+	if idInt.Sign() < 0 || idInt.Cmp(maxUint64) > 0 {
+		return "", errors.New("muxed account id out of uint64 range")
+	}
 
-	// Create muxed payload: 32-byte pubkey + 8-byte memo ID (big endian)
+	// M-address payload: 32-byte pubkey followed by 8-byte big-endian uint64 ID.
 	payload := make([]byte, 40)
-	copy(payload, pubkey)
-	binary.BigEndian.PutUint64(payload[32:], memoID)
+	copy(payload[:32], pubkey)
+	binary.BigEndian.PutUint64(payload[32:], idInt.Uint64())
 
-	// Encode as M address
 	return address.EncodeStrKey(address.VersionByteM, payload)
 }
