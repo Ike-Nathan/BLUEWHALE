@@ -37,7 +37,6 @@ class StrKeyUtil {
   }
 
   static String encodeBase32(Uint8List data) {
-    var charCount = (data.length * 8 + 4) ~/ 5;
     final result = StringBuffer();
 
     int buffer = 0;
