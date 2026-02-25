@@ -1,18 +1,23 @@
 package muxed
 
 import (
-	"math/big"
-	"github.com/stellar/go/strkey"
+	"encoding/binary"
+	"fmt"
+	"github.com/stellar-address-kit/core-go/address"
 )
 
-func EncodeMuxed(baseG string, id string) (string, error) {
-	pubkey, err := strkey.Decode(strkey.VersionByteAccountID, baseG)
+func EncodeMuxed(baseG string, id uint64) (string, error) {
+	versionByte, pubkey, err := address.DecodeStrKey(baseG)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("invalid G address: %w", err)
 	}
-	
-	idInt := new(big.Int)
-	idInt.SetString(id, 10)
-	
-	return strkey.EncodeMuxedAccount(pubkey, idInt.Uint64())
+	if versionByte != address.VersionByteG {
+		return "", fmt.Errorf("invalid G address")
+	}
+
+	payload := make([]byte, 40)
+	copy(payload, pubkey)
+	binary.BigEndian.PutUint64(payload[32:], id)
+
+	return address.EncodeStrKey(address.VersionByteM, payload)
 }
