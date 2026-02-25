@@ -64,3 +64,23 @@ export type ParseResult =
         message: string;
       };
     };
+
+export type Address = {
+  kind: "G" | "M" | "C";
+  address: string;
+  baseG?: string;
+  muxedId?: bigint;
+};
+
+export class AddressParseError extends Error {
+  code: ErrorCode;
+  input: string;
+
+  constructor(code: ErrorCode, input: string, message: string) {
+    super(message);
+    this.name = "AddressParseError";
+    this.code = code;
+    this.input = input;
+    Object.setPrototypeOf(this, AddressParseError.prototype);
+  }
+}

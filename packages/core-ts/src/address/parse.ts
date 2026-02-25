@@ -1,28 +1,51 @@
+import { StrKey } from "@stellar/stellar-sdk";
 import { detect } from "./detect";
-import { ErrorCode, ParseResult } from "./types";
+import { validate } from "./validate";
+import { Address, AddressParseError } from "./types";
 
-export function parse(address: string): ParseResult {
+export function parse(address: string): Address {
   const kind = detect(address);
+  
   if (kind === "invalid") {
+    throw new AddressParseError(
+      "UNKNOWN_PREFIX",
+      address,
+      "Invalid address"
+    );
+  }
+
+  if (!validate(address)) {
+    throw new AddressParseError(
+      "INVALID_CHECKSUM",
+      address,
+      "Address validation failed"
+    );
+  }
+
+  const normalizedAddress = address.toUpperCase();
+
+  if (kind === "M") {
+    const decoded = StrKey.decodeMed25519PublicKey(normalizedAddress);
+    const ed25519 = decoded.subarray(0, 32);
+    const idBytes = decoded.subarray(32, 40);
+
+    let muxedId = 0n;
+    for (const byte of idBytes) {
+      muxedId = (muxedId << 8n) + BigInt(byte);
+    }
+
+    const baseG = StrKey.encodeEd25519PublicKey(ed25519);
+
     return {
-      kind: "invalid",
-      error: {
-        code: "UNKNOWN_PREFIX" as ErrorCode,
-        input: address,
-        message: "Invalid address",
-      },
+      kind,
+      address: normalizedAddress,
+      baseG,
+      muxedId,
     };
   }
 
-  const warnings = [];
-  if (address !== address.toUpperCase()) {
-    warnings.push({
-      code: "NON_CANONICAL_ADDRESS" as const,
-      severity: "warn" as const,
-      message: "Address normalized to uppercase",
-      normalization: { original: address, normalized: address.toUpperCase() },
-    });
-  }
-
-  return { kind, address: address.toUpperCase(), warnings };
+  return {
+    kind,
+    address: normalizedAddress,
+  };
 }
