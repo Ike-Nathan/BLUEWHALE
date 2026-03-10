@@ -55,10 +55,9 @@ describe("encodeMuxed", () => {
   // 4. Validation: Strict Type Checking
   it("throws if id is passed as a number instead of bigint", () => {
     expect(() => {
-      // @ts-expect-error - Testing runtime validation
       encodeMuxed(
         "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVWH4",
-        123,
+        123 as any,
       );
     }).toThrow("ID must be a bigint");
   });

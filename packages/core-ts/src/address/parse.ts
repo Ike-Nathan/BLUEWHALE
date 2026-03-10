@@ -1,9 +1,8 @@
 import { decodeMuxed } from "../muxed/decode";
 import { detect } from "./detect";
-import { AddressParseError } from "./errors";
-import type { Address } from "./types";
+import { ParseResult } from "./types";
 
-export function parse(address: string): Address {
+export function parse(address: string): ParseResult {
   const up = address.toUpperCase();
   const kind = detect(up);
 
@@ -11,20 +10,30 @@ export function parse(address: string): Address {
     // Check if it's likely a checksum error or unknown prefix
     const first = up[0];
     if (first === "G" || first === "M" || first === "C") {
-      throw new AddressParseError(
-        "INVALID_CHECKSUM",
-        address,
-        "Invalid address checksum",
-      );
+      return {
+        kind: "invalid",
+        error: {
+          code: "INVALID_CHECKSUM",
+          input: address,
+          message: "Invalid address checksum",
+        },
+      };
     }
-    throw new AddressParseError("UNKNOWN_PREFIX", address, "Invalid address");
+    return {
+      kind: "invalid",
+      error: {
+        code: "UNKNOWN_PREFIX",
+        input: address,
+        message: "Invalid address",
+      },
+    };
   }
 
   switch (kind) {
     case "G":
-      return { kind: "G", address: up };
+      return { kind: "G", address: up, warnings: [] };
     case "C":
-      return { kind: "C", address: up };
+      return { kind: "C", address: up, warnings: [] };
     case "M": {
       const decoded = decodeMuxed(up);
       return {
@@ -32,6 +41,7 @@ export function parse(address: string): Address {
         address: up,
         baseG: decoded.baseG,
         muxedId: BigInt(decoded.id),
+        warnings: [],
       };
     }
   }
