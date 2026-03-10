@@ -1,4 +1,4 @@
-import { StrKey, MuxedAccount } from "@stellar/stellar-sdk";
+import { decodeMuxed } from "../muxed/decode";
 import { detect } from "./detect";
 import { AddressParseError } from "./errors";
 import type { Address } from "./types";
@@ -18,12 +18,12 @@ export function parse(address: string): Address {
     case "C":
       return { kind: "C", address: up };
     case "M": {
-      const muxed = new MuxedAccount.fromAddress(up, "0");
+      const decoded = decodeMuxed(up);
       return {
         kind: "M",
         address: up,
-        baseG: muxed.baseAccount().accountId(),
-        muxedId: BigInt(muxed.id()),
+        baseG: decoded.baseG,
+        muxedId: BigInt(decoded.id),
       };
     }
   }

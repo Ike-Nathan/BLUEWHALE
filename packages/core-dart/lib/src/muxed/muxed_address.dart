@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import '../address/detect.dart';
 import '../address/codes.dart';
 import '../exceptions.dart';

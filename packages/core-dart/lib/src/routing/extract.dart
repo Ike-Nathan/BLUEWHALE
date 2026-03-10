@@ -1,5 +1,6 @@
 import '../address/parse.dart';
 import '../address/codes.dart';
+import '../muxed/decode.dart';
 import 'result.dart';
 import 'memo.dart';
 

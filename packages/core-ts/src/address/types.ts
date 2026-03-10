@@ -15,3 +15,5 @@ export type Address =
       kind: "C";
       address: string;
     };
+
+export { AddressParseError } from "./errors";
