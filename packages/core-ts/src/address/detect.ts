@@ -19,6 +19,7 @@ function decodeBase32(input: string): Uint8Array {
         result[byteIndex++] = (buffer >> (bitsLeft - 8)) & 0xff;
       }
       bitsLeft -= 8;
+      buffer &= (1 << bitsLeft) - 1; // Mask to keep only the remaining bits
     }
   }
   return result;
@@ -29,10 +30,15 @@ function crc16(bytes: Uint8Array): number {
   for (const byte of bytes) {
     crc ^= byte << 8;
     for (let i = 0; i < 8; i++) {
-      crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
+      if (crc & 0x8000) {
+        crc = (crc << 1) ^ 0x1021;
+      } else {
+        crc <<= 1;
+      }
+      crc &= 0xffff; // Mask to 16 bits to prevent overflow issues
     }
   }
-  return crc & 0xffff;
+  return crc;
 }
 
 function isValidStrKey(address: string): boolean {
@@ -43,8 +49,16 @@ function isValidStrKey(address: string): boolean {
     const checksum =
       decoded[decoded.length - 2] | (decoded[decoded.length - 1] << 8);
     const computed = crc16(data);
+    if (computed !== checksum) {
+      console.log(
+        `DEBUG: Checksum mismatch for ${address.substring(0, 5)}... expected ${checksum}, got ${computed}`,
+      );
+    }
     return computed === checksum;
-  } catch {
+  } catch (e: any) {
+    console.log(
+      `DEBUG: Error decoding ${address.substring(0, 5)}...: ${e.message}`,
+    );
     return false;
   }
 }

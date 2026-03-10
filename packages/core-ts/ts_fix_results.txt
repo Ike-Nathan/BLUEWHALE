@@ -1,0 +1,313 @@
+﻿
+> stellar-address-kit@1.0.0 test
+> vitest run
+
+node.exe : [33mThe CJS build of Vite's Node API is deprecated. See 
+https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for 
+more details.[39m
+At line:1 char:1
++ & "C:\nvm4w\nodejs/node.exe" "C:\nvm4w\nodejs/node_modules/npm/bin/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33mThe CJS bu...e 
+details.[39m    :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90mC:/projetcs/emrys/stellar-address-kit/packages/core-ts[39m
+
+ [33mΓ¥»[39m src/muxed/encode.test.ts [2m ([22m[2m5 tests[22m [2m|[22m [31m2 failed[39m[2m)[22m[90m 28[2mms[22m[39m
+[31m   [33mΓ¥»[31m src/muxed/encode.test.ts[2m > [22mencodeMuxed[2m > [22mthrows if id is outside the uint64 range (negative)[39m
+[31m     ΓåÆ expected [Function] to throw error including 'ID is outside the uint64 range' but got 'Invalid base G address: GA7QYNF7SOWQ3ΓÇª'[39m
+[31m   [33mΓ¥»[31m src/muxed/encode.test.ts[2m > [22mencodeMuxed[2m > [22mthrows if id is outside the uint64 range (exceeds max)[39m
+[31m     ΓåÆ expected [Function] to throw error including 'ID is outside the uint64 range' but got 'Invalid base G address: GA7QYNF7SOWQ3ΓÇª'[39m
+ [33mΓ¥»[39m src/address/parse.test.ts [2m ([22m[2m21 tests[22m [2m|[22m [31m5 failed[39m[2m)[22m[90m 35[2mms[22m[39m
+[31m   [33mΓ¥»[31m src/address/parse.test.ts[2m > [22mparse[2m > [22mM addresses[2m > [22mshould parse a valid M address and decode baseG and muxedId[39m
+[31m     ΓåÆ Invalid address[39m
+[31m   [33mΓ¥»[31m src/address/parse.test.ts[2m > [22mparse[2m > [22mM addresses[2m > [22mshould parse M address with muxedId as bigint[39m
+[31m     ΓåÆ Invalid address[39m
+[31m   [33mΓ¥»[31m src/address/parse.test.ts[2m > [22mparse[2m > [22mM addresses[2m > [22mshould parse M address with large muxedId (2^53+1 canary)[39m
+[31m     ΓåÆ Invalid address[39m
+[31m   [33mΓ¥»[31m src/address/parse.test.ts[2m > [22mparse[2m > [22mM addresses[2m > [22mshould normalize lowercase M address to uppercase[39m
+[31m     ΓåÆ Invalid address[39m
+[31m   [33mΓ¥»[31m src/address/parse.test.ts[2m > [22mparse[2m > [22merror cases[2m > [22mshould throw AddressParseError for G address with invalid checksum[39m
+[31m     ΓåÆ expected 'UNKNOWN_PREFIX' to be 'INVALID_CHECKSUM' // Object.is equality[39m
+ [32mΓ£ô[39m src/spec/validate.test.ts [2m ([22m[2m7 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+ [33mΓ¥»[39m src/spec/detect.test.ts [2m ([22m[2m11 tests[22m [2m|[22m [31m1 failed[39m[2m)[22m[90m 22[2mms[22m[39m
+[31m   [33mΓ¥»[31m src/spec/detect.test.ts[2m > [22mdetect()[2m > [22mshould return "C" for valid C addresses (Contract ID)[39m
+[31m     ΓåÆ expected 'invalid' to be 'C' // Object.is equality[39m
+ [33mΓ¥»[39m src/spec/runner.test.ts [2m ([22m[2m17 tests[22m [2m|[22m [31m6 failed[39m[2m)[22m[90m 39[2mms[22m[39m
+[31m   [33mΓ¥»[31m src/spec/runner.test.ts[2m > [22mNormative Vector Tests[2m > [22m[detect] lowercase G accepted with normalization warning[39m
+[31m     ΓåÆ expected 'invalid' to be 'G' // Object.is equality[39m
+[31m   [33mΓ¥»[31m src/spec/runner.test.ts[2m > [22mNormative Vector Tests[2m > [22m[extract_routing] M-address routing (no memo)[39m
+[31m     ΓåÆ Invalid address[39m
+[31m   [33mΓ¥»[31m src/spec/runner.test.ts[2m > [22mNormative Vector Tests[2m > [22m[extract_routing] C-address rejection[39m
+[31m     ΓåÆ Invalid address[39m
+[31m   [33mΓ¥»[31m src/spec/runner.test.ts[2m > [22mNormative Vector Tests[2m > [22m[extract_routing] G-address + MEMO_ID routing[39m
+[31m     ΓåÆ Invalid address[39m
+[31m   [33mΓ¥»[31m src/spec/runner.test.ts[2m > [22mNormative Vector Tests[2m > [22m[extract_routing] G-address + MEMO_TEXT numeric routing[39m
+[31m     ΓåÆ Invalid address[39m
+[31m   [33mΓ¥»[31m src/spec/runner.test.ts[2m > [22mNormative Vector Tests[2m > [22m[extract_routing] Memo ID leading zeros normalization[39m
+[31m     ΓåÆ Invalid address[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1m[7m Failed Tests 14 
+[27m[22mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/address/parse.test.ts[2m > 
+[22mparse[2m > [22mM addresses[2m > [22mshould parse a valid M address 
+and decode baseG and muxedId
+[31m[1mAddressParseError[22m: Invalid address[39m
+[36m [2mΓ¥»[22m Module.parse src/address/parse.ts:[2m10:11[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m  [35mif[39m (kind [33m===[39m [32m"invalid"[39m) {
+    [90m 10| [39m    [35mthrow[39m [35mnew[39m 
+[33mAddressParseError[39m([32m"UNKNOWN_PREFIX"[39m[33m,[39m 
+address[33m,[39m [32m"Invalid ad[39mΓÇª
+    [90m   | [39m          [31m^[39m
+    [90m 11| [39m  }
+    [90m 12| [39m
+[90m [2mΓ¥»[22m src/address/parse.test.ts:[2m41:22[22m[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'UNKNOWN_PREFIX', input: 
+'MBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OAAAAAAAAAAAPOGV' }[39m
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[1/14]ΓÄ»[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/address/parse.test.ts[2m > 
+[22mparse[2m > [22mM addresses[2m > [22mshould parse M address with 
+muxedId as bigint
+[31m[1mAddressParseError[22m: Invalid address[39m
+[36m [2mΓ¥»[22m Module.parse src/address/parse.ts:[2m10:11[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m  [35mif[39m (kind [33m===[39m [32m"invalid"[39m) {
+    [90m 10| [39m    [35mthrow[39m [35mnew[39m 
+[33mAddressParseError[39m([32m"UNKNOWN_PREFIX"[39m[33m,[39m 
+address[33m,[39m [32m"Invalid ad[39mΓÇª
+    [90m   | [39m          [31m^[39m
+    [90m 11| [39m  }
+    [90m 12| [39m
+[90m [2mΓ¥»[22m src/address/parse.test.ts:[2m54:22[22m[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'UNKNOWN_PREFIX', input: 
+'MBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OAAAAAAAAAAAPOGV' }[39m
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[2/14]ΓÄ»[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/address/parse.test.ts[2m > 
+[22mparse[2m > [22mM addresses[2m > [22mshould parse M address with 
+large muxedId (2^53+1 canary)
+[31m[1mAddressParseError[22m: Invalid address[39m
+[36m [2mΓ¥»[22m Module.parse src/address/parse.ts:[2m10:11[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m  [35mif[39m (kind [33m===[39m [32m"invalid"[39m) {
+    [90m 10| [39m    [35mthrow[39m [35mnew[39m 
+[33mAddressParseError[39m([32m"UNKNOWN_PREFIX"[39m[33m,[39m 
+address[33m,[39m [32m"Invalid ad[39mΓÇª
+    [90m   | [39m          [31m^[39m
+    [90m 11| [39m  }
+    [90m 12| [39m
+[90m [2mΓ¥»[22m src/address/parse.test.ts:[2m63:22[22m[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'UNKNOWN_PREFIX', input: 
+'MBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OABAAAAAAAAAAEORE' }[39m
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[3/14]ΓÄ»[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/address/parse.test.ts[2m > 
+[22mparse[2m > [22mM addresses[2m > [22mshould normalize lowercase M 
+address to uppercase
+[31m[1mAddressParseError[22m: Invalid address[39m
+[36m [2mΓ¥»[22m Module.parse src/address/parse.ts:[2m10:11[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m  [35mif[39m (kind [33m===[39m [32m"invalid"[39m) {
+    [90m 10| [39m    [35mthrow[39m [35mnew[39m 
+[33mAddressParseError[39m([32m"UNKNOWN_PREFIX"[39m[33m,[39m 
+address[33m,[39m [32m"Invalid ad[39mΓÇª
+    [90m   | [39m          [31m^[39m
+    [90m 11| [39m  }
+    [90m 12| [39m
+[90m [2mΓ¥»[22m src/address/parse.test.ts:[2m87:22[22m[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'UNKNOWN_PREFIX', input: 
+'mbrpyhil2ci3fnq4bxlfmndlfjunpu2hy3zmfshonuceoasw7qc7oaaaaaaaaaaapogv' }[39m
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[4/14]ΓÄ»[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/address/parse.test.ts[2m > 
+[22mparse[2m > [22merror cases[2m > [22mshould throw AddressParseError 
+for G address with invalid checksum
+[31m[1mAssertionError[22m: expected 'UNKNOWN_PREFIX' to be 
+'INVALID_CHECKSUM' // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- INVALID_CHECKSUM[39m
+[31m+ UNKNOWN_PREFIX[39m
+
+[36m [2mΓ¥»[22m src/address/parse.test.ts:[2m194:51[22m[39m
+    [90m192| [39m      } [35mcatch[39m (error) {
+    [90m193| [39m        [34mexpect[39m(error)[33m.[39m[34mtoBeInstance
+Of[39m([33mAddressParseError[39m)[33m;[39m
+    [90m194| [39m        [34mexpect[39m((error [35mas[39m [33mAddressPa
+rseError[39m)[33m.[39mcode)[33m.[39m[34mtoBe[39m([32m"INVALID_CHECKS[
+39mΓÇª
+    [90m   | [39m                                                  
+[31m^[39m
+    [90m195| [39m        [34mexpect[39m((error [35mas[39m [33mAddressPa
+rseError[39m)[33m.[39minput)[33m.[39m[34mtoBe[39m(invalidChecksuΓÇª
+    [90m196| [39m      }
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[5/14]ΓÄ»[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/muxed/encode.test.ts[2m > 
+[22mencodeMuxed[2m > [22mthrows if id is outside the uint64 range 
+(negative)
+[31m[1mAssertionError[22m: expected [Function] to throw error including 
+'ID is outside the uint64 range' but got 'Invalid base G address: 
+GA7QYNF7SOWQ3ΓÇª'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- ID is outside the uint64 range[39m
+[31m+ Invalid base G address: 
+GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVWH4[39m
+
+[36m [2mΓ¥»[22m src/muxed/encode.test.ts:[2m42:8[22m[39m
+    [90m 40| [39m        [33m-[39m[34m1n[39m[33m,[39m
+    [90m 41| [39m      )[33m;[39m
+    [90m 42| [39m    })[33m.[39m[34mtoThrow[39m([32m"ID is outside the 
+uint64 range"[39m)[33m;[39m
+    [90m   | [39m       [31m^[39m
+    [90m 43| [39m  })[33m;[39m
+    [90m 44| [39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[6/14]ΓÄ»[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/muxed/encode.test.ts[2m > 
+[22mencodeMuxed[2m > [22mthrows if id is outside the uint64 range (exceeds 
+max)
+[31m[1mAssertionError[22m: expected [Function] to throw error including 
+'ID is outside the uint64 range' but got 'Invalid base G address: 
+GA7QYNF7SOWQ3ΓÇª'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- ID is outside the uint64 range[39m
+[31m+ Invalid base G address: 
+GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVWH4[39m
+
+[36m [2mΓ¥»[22m src/muxed/encode.test.ts:[2m52:8[22m[39m
+    [90m 50| [39m        [33mMAX_UINT64[39m [33m+[39m 
+[34m1n[39m[33m,[39m
+    [90m 51| [39m      )[33m;[39m
+    [90m 52| [39m    })[33m.[39m[34mtoThrow[39m([32m"ID is outside the 
+uint64 range"[39m)[33m;[39m
+    [90m   | [39m       [31m^[39m
+    [90m 53| [39m  })[33m;[39m
+    [90m 54| [39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[7/14]ΓÄ»[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/spec/detect.test.ts[2m > 
+[22mdetect()[2m > [22mshould return "C" for valid C addresses (Contract ID)
+[31m[1mAssertionError[22m: expected 'invalid' to be 'C' // Object.is 
+equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- C[39m
+[31m+ invalid[39m
+
+[36m [2mΓ¥»[22m src/spec/detect.test.ts:[2m15:30[22m[39m
+    [90m 13| [39m
+    [90m 14| [39m  [34mit[39m([32m'should return "C" for valid C 
+addresses (Contract ID)'[39m[33m,[39m () [33m=>[39m {
+    [90m 15| [39m    [34mexpect[39m([34mdetect[39m([33mSAMPLE_C[39m))
+[33m.[39m[34mtoBe[39m([32m"C"[39m)[33m;[39m
+    [90m   | [39m                             [31m^[39m
+    [90m 16| [39m  })[33m;[39m
+    [90m 17| [39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[8/14]ΓÄ»[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/spec/runner.test.ts[2m > 
+[22mNormative Vector Tests[2m > [22m[detect] lowercase G accepted with 
+normalization warning
+[31m[1mAssertionError[22m: expected 'invalid' to be 'G' // Object.is 
+equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- G[39m
+[31m+ invalid[39m
+
+[36m [2mΓ¥»[22m src/spec/runner.test.ts:[2m11:24[22m[39m
+    [90m  9| [39m        [35mcase[39m [32m"detect"[39m[33m:[39m {
+    [90m 10| [39m          [35mconst[39m kind [33m=[39m 
+[34mdetect[39m(c[33m.[39minput[33m.[39maddress)[33m;[39m
+    [90m 11| [39m          [34mexpect[39m(kind)[33m.[39m[34mtoBe[39m(c
+[33m.[39mexpected[33m.[39mkind)[33m;[39m
+    [90m   | [39m                       [31m^[39m
+    [90m 12| [39m          [35mbreak[39m[33m;[39m
+    [90m 13| [39m        }
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[9/14]ΓÄ»[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/spec/runner.test.ts[2m > 
+[22mNormative Vector Tests[2m > [22m[extract_routing] M-address routing 
+(no memo)
+[31m[1m[7m FAIL [27m[22m[39m src/spec/runner.test.ts[2m > 
+[22mNormative Vector Tests[2m > [22m[extract_routing] C-address rejection
+[31m[1m[7m FAIL [27m[22m[39m src/spec/runner.test.ts[2m > 
+[22mNormative Vector Tests[2m > [22m[extract_routing] G-address + MEMO_ID 
+routing
+[31m[1m[7m FAIL [27m[22m[39m src/spec/runner.test.ts[2m > 
+[22mNormative Vector Tests[2m > [22m[extract_routing] G-address + 
+MEMO_TEXT numeric routing
+[31m[1m[7m FAIL [27m[22m[39m src/spec/runner.test.ts[2m > 
+[22mNormative Vector Tests[2m > [22m[extract_routing] Memo ID leading 
+zeros normalization
+[31m[1mAddressParseError[22m: Invalid address[39m
+[36m [2mΓ¥»[22m Module.parse src/address/parse.ts:[2m10:11[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m  [35mif[39m (kind [33m===[39m [32m"invalid"[39m) {
+    [90m 10| [39m    [35mthrow[39m [35mnew[39m 
+[33mAddressParseError[39m([32m"UNKNOWN_PREFIX"[39m[33m,[39m 
+address[33m,[39m [32m"Invalid ad[39mΓÇª
+    [90m   | [39m          [31m^[39m
+    [90m 11| [39m  }
+    [90m 12| [39m
+[90m [2mΓ¥»[22m Module.extractRouting 
+src/routing/extract.ts:[2m8:18[22m[39m
+[90m [2mΓ¥»[22m src/spec/runner.test.ts:[2m31:26[22m[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'UNKNOWN_PREFIX', input: 'MA
+7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1AAJZRE6LRE6LRE6LRE6LRE6LRE6LRE
+6LRE6LRE6LRE6LRE6LR' }[39m
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[10
+/14]ΓÄ»[22m[39m
+
+[2m Test Files [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (5)[39m
+[2m      Tests [22m [1m[31m14 failed[39m[22m[2m | [22m[1m[32m47 passed[39m[22m[90m (61)[39m
+[2m   Start at [22m 11:05:44
+[2m   Duration [22m 1.65s[2m (transform 353ms, setup 1ms, collect 4.29s, tests 132ms, environment 3ms, prepare 1.65s)[22m
+

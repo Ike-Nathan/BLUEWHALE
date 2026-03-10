@@ -4,13 +4,21 @@ import { AddressParseError } from "./errors";
 import type { Address } from "./types";
 
 export function parse(address: string): Address {
-  const kind = detect(address);
+  const up = address.toUpperCase();
+  const kind = detect(up);
 
   if (kind === "invalid") {
+    // Check if it's likely a checksum error or unknown prefix
+    const first = up[0];
+    if (first === "G" || first === "M" || first === "C") {
+      throw new AddressParseError(
+        "INVALID_CHECKSUM",
+        address,
+        "Invalid address checksum",
+      );
+    }
     throw new AddressParseError("UNKNOWN_PREFIX", address, "Invalid address");
   }
-
-  const up = address.toUpperCase();
 
   switch (kind) {
     case "G":

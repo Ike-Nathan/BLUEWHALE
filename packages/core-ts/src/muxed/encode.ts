@@ -7,12 +7,12 @@ export function encodeMuxed(baseG: string, id: bigint): string {
     throw new TypeError(`ID must be a bigint, received ${typeof id}`);
   }
 
-  if (!StrKey.isValidEd25519PublicKey(baseG)) {
-    throw new Error(`Invalid base G address: ${baseG}`);
-  }
-
   if (id < 0n || id > MAX_UINT64) {
     throw new Error(`ID is outside the uint64 range: ${id.toString()}`);
+  }
+
+  if (StrKey.isValidEd25519PublicKey(baseG) === false) {
+    throw new Error(`Invalid base G address: ${baseG}`);
   }
 
   const baseAccount = new Account(baseG, "0");

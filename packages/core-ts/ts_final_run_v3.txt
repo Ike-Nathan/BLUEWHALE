@@ -1,0 +1,58 @@
+﻿
+> stellar-address-kit@1.0.0 test
+> vitest run
+
+node.exe : [33mThe CJS build of Vite's Node API is deprecated. See 
+https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for 
+more details.[39m
+At line:1 char:1
++ & "C:\nvm4w\nodejs/node.exe" "C:\nvm4w\nodejs/node_modules/npm/bin/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33mThe CJS bu...e details.[39m 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90mC:/projetcs/emrys/stellar-address-kit/packages/core-ts[39m
+
+ [32mΓ£ô[39m src/address/parse.test.ts [2m ([22m[2m21 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+ [32mΓ£ô[39m src/muxed/encode.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 9[2mms[22m[39m
+ [32mΓ£ô[39m src/spec/validate.test.ts [2m ([22m[2m7 tests[22m[2m)[22m[90m 7[2mms[22m[39m
+ [32mΓ£ô[39m src/spec/detect.test.ts [2m ([22m[2m11 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+ [33mΓ¥»[39m src/spec/runner.test.ts [2m ([22m[2m17 tests[22m [2m|[22m [31m1 failed[39m[2m)[22m[90m 23[2mms[22m[39m
+[31m   [33mΓ¥»[31m src/spec/runner.test.ts[2m > [22mNormative Vector Tests[2m > [22m[detect] lowercase G accepted with normalization warning[39m
+[31m     ΓåÆ expected 'invalid' to be 'G' // Object.is equality[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1m[7m Failed Tests 1 
+[27m[22mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/spec/runner.test.ts[2m > 
+[22mNormative Vector Tests[2m > [22m[detect] lowercase G accepted with 
+normalization warning
+[31m[1mAssertionError[22m: expected 'invalid' to be 'G' // Object.is 
+equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- G[39m
+[31m+ invalid[39m
+
+[36m [2mΓ¥»[22m src/spec/runner.test.ts:[2m11:24[22m[39m
+    [90m  9| [39m        [35mcase[39m [32m"detect"[39m[33m:[39m {
+    [90m 10| [39m          [35mconst[39m kind [33m=[39m 
+[34mdetect[39m(c[33m.[39minput[33m.[39maddress)[33m;[39m
+    [90m 11| [39m          [34mexpect[39m(kind)[33m.[39m[34mtoBe[39m(c
+[33m.[39mexpected[33m.[39mkind)[33m;[39m
+    [90m   | [39m                       [31m^[39m
+    [90m 12| [39m          [35mbreak[39m[33m;[39m
+    [90m 13| [39m        }
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»[1/1]ΓÄ»[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (5)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m60 passed[39m[22m[90m (61)[39m
+[2m   Start at [22m 11:22:33
+[2m   Duration [22m 1.25s[2m (transform 240ms, setup 0ms, collect 3.13s, tests 60ms, environment 1ms, prepare 1.33s)[22m
+
