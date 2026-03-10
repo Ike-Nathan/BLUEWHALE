@@ -19,7 +19,7 @@ function decodeBase32(input: string): Uint8Array {
         result[byteIndex++] = (buffer >> (bitsLeft - 8)) & 0xff;
       }
       bitsLeft -= 8;
-      buffer &= (1 << bitsLeft) - 1; // Mask to keep only the remaining bits
+      buffer &= (1 << bitsLeft) - 1;
     }
   }
   return result;
@@ -35,49 +35,44 @@ function crc16(bytes: Uint8Array): number {
       } else {
         crc <<= 1;
       }
-      crc &= 0xffff; // Mask to 16 bits to prevent overflow issues
+      crc &= 0xffff;
     }
   }
   return crc;
 }
 
-function isValidStrKey(address: string): boolean {
-  try {
-    const decoded = decodeBase32(address);
-    if (decoded.length < 3) return false;
-    const data = decoded.slice(0, decoded.length - 2);
-    const checksum =
-      decoded[decoded.length - 2] | (decoded[decoded.length - 1] << 8);
-    const computed = crc16(data);
-    if (computed !== checksum) {
-      console.log(
-        `DEBUG: Checksum mismatch for ${address.substring(0, 5)}... expected ${checksum}, got ${computed}`,
-      );
-    }
-    return computed === checksum;
-  } catch (e: any) {
-    console.log(
-      `DEBUG: Error decoding ${address.substring(0, 5)}...: ${e.message}`,
-    );
-    return false;
-  }
-}
-
+/**
+ * Detects the kind of a Stellar address.
+ * Standard addresses (G, M, C) are validated using the Stellar SDK.
+ * Custom M-addresses (0x60 format) are validated using internal logic.
+ */
 export function detect(address: string): "G" | "M" | "C" | "invalid" {
   if (!address) return "invalid";
   const up = address.toUpperCase();
 
-  if (!isValidStrKey(up)) return "invalid";
+  // 1. Try standard SDK validation (prioritize these)
+  if (StrKey.isValidEd25519PublicKey(up)) return "G";
+  if (StrKey.isValidMed25519PublicKey(up)) return "M";
+  if (StrKey.isValidContract(up)) return "C";
 
-  const prefix = up[0];
-  switch (prefix) {
-    case "G":
-      return "G";
-    case "M":
-      return "M";
-    case "C":
-      return "C";
-    default:
-      return "invalid";
+  // 2. Fallback for custom 0x60 muxed addresses
+  try {
+    const prefix = up[0];
+    if (prefix === "M") {
+      const decoded = decodeBase32(up);
+      // M-addresses are 43 bytes: 1 (version) + 32 (pubkey) + 8 (id) + 2 (checksum)
+      if (decoded.length === 43 && decoded[0] === 0x60) {
+        const data = decoded.slice(0, decoded.length - 2);
+        const checksum =
+          decoded[decoded.length - 2] | (decoded[decoded.length - 1] << 8);
+        if (crc16(data) === checksum) {
+          return "M";
+        }
+      }
+    }
+  } catch {
+    // Ignore and proceed to return "invalid"
   }
+
+  return "invalid";
 }
