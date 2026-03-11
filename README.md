@@ -282,6 +282,6 @@ MIT, see [LICENSE](./LICENSE)
 Built on top of:
 
 - [Stellar SDK](https://github.com/stellar/js-stellar-sdk), StrKey, MuxedAccount, Address primitives
-- [stellar/go/strkey](https://github.com/stellar/go), Go StrKey and muxed account implementation
+- [stellar/go/strkey](https://github.com/stellar/go-stellar-sdk/tree/main/strkey), Go StrKey and muxed account implementation
 - [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md), StrKey encoding format specification
 - [CAP-0027](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0027.md), Muxed account protocol-level definition
