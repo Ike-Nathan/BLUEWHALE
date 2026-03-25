@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-
-	"github.com/stellar-address-kit/core-go/address"
 )
 
 type MemoType string
@@ -66,17 +64,4 @@ func (r *RoutingID) Uint64() (uint64, error) {
 
 func NewRoutingID(s string) *RoutingID {
 	return &RoutingID{raw: s}
-}
-
-type RoutingResult struct {
-	DestinationBaseAccount string
-	RoutingID              *RoutingID
-	RoutingSource          string // "muxed" | "memo" | "none"
-	Warnings               []address.Warning
-	DestinationError       *DestinationError
-}
-
-type DestinationError struct {
-	Code    address.ErrorCode
-	Message string
 }
