@@ -3,11 +3,28 @@ package routing
 import (
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/stellar-address-kit/core-go/address"
 )
 
 var digitsOnlyRegex = regexp.MustCompile(`^\d+$`)
+
+func normalizeUnsupportedMemoType(memoType string) string {
+	switch memoType {
+	case "hash", "return":
+		return memoType
+	}
+
+	switch strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(memoType, "_", ""), "-", "")) {
+	case "memohash":
+		return "hash"
+	case "memoreturn":
+		return "return"
+	default:
+		return ""
+	}
+}
 
 func ExtractRouting(input RoutingInput) RoutingResult {
 	parsed, err := address.Parse(input.Destination)
@@ -75,6 +92,7 @@ func ExtractRouting(input RoutingInput) RoutingResult {
 	routingID := ""
 	routingSource := "none"
 	warnings := []address.Warning{}
+	unsupportedMemoType := normalizeUnsupportedMemoType(input.MemoType)
 
 	if input.MemoType == "id" {
 		norm := NormalizeMemoTextID(input.MemoValue)
@@ -104,13 +122,13 @@ func ExtractRouting(input RoutingInput) RoutingResult {
 				Message:  "MEMO_TEXT was not a valid numeric uint64.",
 			})
 		}
-	} else if input.MemoType == "hash" || input.MemoType == "return" {
+	} else if unsupportedMemoType != "" {
 		warnings = append(warnings, address.Warning{
 			Code:     address.WarnUnsupportedMemoType,
 			Severity: "warn",
-			Message:  "Memo type " + input.MemoType + " is not supported for routing.",
+			Message:  "Memo type " + unsupportedMemoType + " is not supported for routing.",
 			Context: &address.WarningContext{
-				MemoType: input.MemoType,
+				MemoType: unsupportedMemoType,
 			},
 		})
 	} else if input.MemoType != "none" {
