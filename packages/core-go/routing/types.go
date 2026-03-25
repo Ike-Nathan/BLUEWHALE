@@ -2,6 +2,15 @@ package routing
 
 import "github.com/stellar-address-kit/core-go/address"
 
+type Warning struct {
+	Code    string `json:"code"`
+	Message string `json:"message,omitempty"`
+}
+
+const (
+	WarningMemoIgnored = "memo_ignored"
+)
+
 // RoutingInput represents incoming routing payload data.
 type RoutingInput struct {
 	SourceAddress string            `json:"sourceAddress"`
@@ -22,11 +31,11 @@ type RoutingResult struct {
 	ErrorMessage      string            `json:"errorMessage,omitempty"`
 
 	// Backward-compatible fields used by current extraction flow.
-	DestinationBaseAccount string             `json:"destinationBaseAccount,omitempty"`
-	RoutingID              string             `json:"routingId,omitempty"`
-	RoutingSource          string             `json:"routingSource,omitempty"`
-	Warnings               []address.Warning  `json:"warnings,omitempty"`
-	DestinationError       *DestinationError  `json:"destinationError,omitempty"`
+	DestinationBaseAccount string            `json:"destinationBaseAccount,omitempty"`
+	RoutingID              string            `json:"routingId,omitempty"`
+	RoutingSource          string            `json:"routingSource,omitempty"`
+	Warnings               []Warning         `json:"warnings,omitempty"`
+	DestinationError       *DestinationError `json:"destinationError,omitempty"`
 }
 
 type DestinationError struct {
