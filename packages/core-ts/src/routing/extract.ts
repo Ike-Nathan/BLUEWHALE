@@ -40,14 +40,8 @@ export function extractRouting(input: RoutingInput): RoutingResult {
 
   if (parsed.kind === "invalid") {
     return {
-      destinationBaseAccount: null,
-      routingId: null,
-      routingSource: "none",
+      source: "none",
       warnings: [],
-      destinationError: {
-        code: parsed.error.code,
-        message: parsed.error.message,
-      },
     };
   }
 
@@ -79,9 +73,8 @@ export function extractRouting(input: RoutingInput): RoutingResult {
     }
 
     return {
-      destinationBaseAccount: baseG,
-      routingId: id.toString(),
-      routingSource: "muxed",
+      source: "muxed",
+      id,
       warnings,
     };
   }
@@ -133,9 +126,8 @@ export function extractRouting(input: RoutingInput): RoutingResult {
   }
 
   return {
-    destinationBaseAccount: parsed.address,
-    routingId,
-    routingSource,
+    source: routingSource,
+    id: routingId ? BigInt(routingId) : undefined,
     warnings,
   };
 }

@@ -1,4 +1,4 @@
-import { ErrorCode, Warning } from "../address/types";
+import { Warning } from "../address/types";
 
 export type RoutingInput = {
   destination: string;
@@ -9,17 +9,13 @@ export type RoutingInput = {
 
 export type KnownMemoType = "none" | "id" | "text" | "hash" | "return";
 
-export type RoutingResult = {
-  destinationBaseAccount: string | null;
-  routingId: string | null; // decimal uint64 string — spec level
-  routingSource: "muxed" | "memo" | "none";
-  warnings: Warning[]; // WarningCode only, always
-  destinationError?: {
-    // ErrorCode only, when destination unparseable
-    code: ErrorCode;
-    message: string;
-  };
-};
+export type RoutingSource = "muxed" | "memo" | "none";
+
+export interface RoutingResult {
+  source: RoutingSource;
+  id?: bigint;
+  warnings: Warning[];
+}
 
 /**
  * Ergonomic helper for TypeScript callers to get a BigInt from the routingId string.
