@@ -22,7 +22,6 @@ const BASE32_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
  * const bytes = decodeBase32("MZXW6==="); // "foo"
  * console.log(new TextDecoder().decode(bytes)); // "foo"
  */
- */
 function decodeBase32(input: string): Uint8Array {
   const s = input.toUpperCase().replace(/=+$/, "");
   const byteCount = Math.floor((s.length * 5) / 8);
@@ -46,6 +45,25 @@ function decodeBase32(input: string): Uint8Array {
   return result;
 }
 
+/**
+ * Computes a 16-bit CRC (Cyclic Redundancy Check) for the given byte array.
+ *
+ * This implementation uses the CRC-16-CCITT polynomial (0x1021) with:
+ * - Initial value: 0x0000
+ * - No reflection (input or output)
+ * - No final XOR
+ *
+ * The function processes each byte bit-by-bit, updating the CRC value
+ * using a shift register and polynomial XOR operations.
+ *
+ * @param bytes - The input data as a Uint8Array.
+ * @returns The computed 16-bit CRC value as a number (0–65535).
+ *
+ * @example
+ * const data = new Uint8Array([0x01, 0x02, 0x03]);
+ * const checksum = crc16(data);
+ * console.log(checksum); // e.g., 0x6131
+ */
 function crc16(bytes: Uint8Array): number {
   let crc = 0;
   for (const byte of bytes) {
