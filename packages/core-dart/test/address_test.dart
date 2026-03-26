@@ -36,5 +36,12 @@ void main() {
       final result = StellarAddress.parse(validAddress);
       expect(result.kind, equals(AddressKind.g));
     });
+
+    test('identifies kind as m for valid muxed address', () {
+      const validMuxed =
+          'MAQAA5L65LSYH7CQWE7NNYSR42O4EFOA2OOYNDO643ZPNL6MQBBAAABBAAABBAAABBAAA';
+      final result = StellarAddress.parse(validMuxed);
+      expect(result.kind, equals(AddressKind.m));
+    });
   });
 }
