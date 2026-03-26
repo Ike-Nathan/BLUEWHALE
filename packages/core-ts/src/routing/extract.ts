@@ -1,8 +1,7 @@
-import { RoutingInput, RoutingResult } from "./types";
+import { RoutingInput, RoutingResult, Warning } from "./types";
 import { parse } from "../address/parse";
 import { decodeMuxed } from "../muxed/decode";
 import { normalizeMemoTextId } from "./memo";
-import { Warning } from "../address/types";
 
 export class ExtractRoutingError extends Error {
   constructor(message: string) {
