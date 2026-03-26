@@ -32,7 +32,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 		},
 		{
-			name: "g_address_with_memo_id_routes_memo",
+			name: "memo-id",
 			input: RoutingInput{
 				Destination: testBaseG,
 				MemoType:    "id",
@@ -46,10 +46,24 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 		},
 		{
-			name: "g_address_with_numeric_memo_text_routes_memo",
+			name: "memo-text",
 			input: RoutingInput{
 				Destination: testBaseG,
 				MemoType:    "text",
+				MemoValue:   "200",
+			},
+			expected: RoutingResult{
+				DestinationBaseAccount: testBaseG,
+				RoutingID:              "200",
+				RoutingSource:          "memo",
+				Warnings:               []address.Warning{},
+			},
+		},
+		{
+			name: "memo-id-normalization",
+			input: RoutingInput{
+				Destination: testBaseG,
+				MemoType:    "id",
 				MemoValue:   "007",
 			},
 			expected: RoutingResult{
@@ -70,11 +84,34 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 		},
 		{
-			name: "g_address_with_supported_but_unroutable_memo_warns_unsupported",
+			name: "memo-hash",
+			input: RoutingInput{
+				Destination: testBaseG,
+				MemoType:    "hash",
+				MemoValue:   "not-a-routing-id",
+			},
+			expected: RoutingResult{
+				DestinationBaseAccount: testBaseG,
+				RoutingID:              "",
+				RoutingSource:          "none",
+				Warnings: []address.Warning{
+					{
+						Code:     address.WarnUnsupportedMemoType,
+						Severity: "warn",
+						Message:  "Memo type hash is not supported for routing.",
+						Context: &address.WarningContext{
+							MemoType: "hash",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "memo-return",
 			input: RoutingInput{
 				Destination: testBaseG,
 				MemoType:    "MEMO_RETURN",
-				MemoValue:   "not-a-routing-id",
+				MemoValue:   "also-not-a-routing-id",
 			},
 			expected: RoutingResult{
 				DestinationBaseAccount: testBaseG,
@@ -116,7 +153,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 		},
 		{
-			name: "m_address_without_incoming_memo_routes_muxed",
+			name: "muxed",
 			input: RoutingInput{
 				Destination: testMuxed,
 				MemoType:    "none",
@@ -178,30 +215,32 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 }
 
 func TestExtractRouting_ContractSourceClearsRoutingState(t *testing.T) {
-	contractAddress, err := address.EncodeStrKey(address.VersionByteC, make([]byte, 32))
-	if err != nil {
-		t.Fatalf("failed to generate contract address: %v", err)
-	}
+	t.Run("contract-source", func(t *testing.T) {
+		contractAddress, err := address.EncodeStrKey(address.VersionByteC, make([]byte, 32))
+		if err != nil {
+			t.Fatalf("failed to generate contract address: %v", err)
+		}
 
-	result := ExtractRouting(RoutingInput{
-		Destination:   testBaseG,
-		MemoType:      "id",
-		MemoValue:     "100",
-		SourceAccount: contractAddress,
-	})
+		result := ExtractRouting(RoutingInput{
+			Destination:   testBaseG,
+			MemoType:      "id",
+			MemoValue:     "100",
+			SourceAccount: contractAddress,
+		})
 
-	expected := RoutingResult{
-		RoutingSource: "none",
-		Warnings: []address.Warning{
-			{
-				Code:     address.WarnContractSenderDetected,
-				Severity: "info",
-				Message:  "Contract source detected. Routing state cleared.",
+		expected := RoutingResult{
+			RoutingSource: "none",
+			Warnings: []address.Warning{
+				{
+					Code:     address.WarnContractSenderDetected,
+					Severity: "info",
+					Message:  "Contract source detected. Routing state cleared.",
+				},
 			},
-		},
-	}
+		}
 
-	assertRoutingResult(t, result, expected)
+		assertRoutingResult(t, result, expected)
+	})
 }
 
 func assertRoutingResult(t *testing.T, got, want RoutingResult) {
