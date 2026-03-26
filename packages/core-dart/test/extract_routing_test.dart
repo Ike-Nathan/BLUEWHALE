@@ -14,7 +14,7 @@ void main() {
 
       expect(result.destinationBaseAccount, baseG);
       expect(result.routingId, '9007199254740993');
-      expect(result.routingSource, 'muxed');
+      expect(result.routingSource, RoutingSource.muxed);
       expect(result.warnings, isEmpty);
       expect(result.destinationError, isNull);
     });
@@ -30,7 +30,7 @@ void main() {
 
       expect(result.destinationBaseAccount, baseG);
       expect(result.routingId, '42');
-      expect(result.routingSource, 'memo');
+      expect(result.routingSource, RoutingSource.memo);
       expect(result.destinationError, isNull);
       expect(result.warnings, hasLength(1));
       expect(result.warnings.first.code, WarningCode.memoIgnoredForMuxed);
@@ -48,7 +48,7 @@ void main() {
 
       expect(result.destinationBaseAccount, baseG);
       expect(result.routingId, isNull);
-      expect(result.routingSource, 'none');
+      expect(result.routingSource, RoutingSource.none);
       expect(result.destinationError, isNull);
       expect(
         result.warnings.map((warning) => warning.code),
@@ -67,7 +67,7 @@ void main() {
 
       expect(result.destinationBaseAccount, baseG);
       expect(result.routingId, '100');
-      expect(result.routingSource, 'memo');
+      expect(result.routingSource, RoutingSource.memo);
       expect(result.warnings, isEmpty);
       expect(result.destinationError, isNull);
     });
