@@ -1,4 +1,6 @@
-import { StrKey } from "@stellar/stellar-sdk";
+import StellarSdk from "@stellar/stellar-sdk";
+
+const { StrKey } = StellarSdk;
 
 const BASE32_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 

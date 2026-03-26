@@ -80,7 +80,7 @@ export function extractRouting(input: RoutingInput): RoutingResult {
 
     return {
       destinationBaseAccount: baseG,
-      routingId: id,
+      routingId: id.toString(),
       routingSource: "muxed",
       warnings,
     };

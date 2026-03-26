@@ -1,4 +1,6 @@
-import { Account, MuxedAccount, StrKey } from "@stellar/stellar-sdk";
+import StellarSdk from "@stellar/stellar-sdk";
+
+const { Account, MuxedAccount, StrKey } = StellarSdk;
 
 const MAX_UINT64 = 18446744073709551615n;
 
