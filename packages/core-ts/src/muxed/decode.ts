@@ -1,4 +1,7 @@
-import { StrKey } from "@stellar/stellar-sdk";
+import StellarSdk from "@stellar/stellar-sdk";
+import { MuxedResult } from "./types";
+
+const { StrKey } = StellarSdk;
 
 const BASE32_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
@@ -49,7 +52,13 @@ function decodeStrKey(address: string): Uint8Array {
   return data;
 }
 
-export function decodeMuxed(mAddress: string): { baseG: string; id: string } {
+/**
+ * Decodes a Stellar muxed address (M-address).
+ *
+ * @param {string} mAddress - The muxed address to decode.
+ * @returns {baseG: string, id: bigint}
+ */
+export function decodeMuxed(mAddress: string): MuxedResult {
   const data = decodeStrKey(mAddress);
   // Layout: [Version(1)] [Pubkey(32)] [ID(8)]
   if (data.length !== 41) throw new Error("invalid payload length");
@@ -63,7 +72,7 @@ export function decodeMuxed(mAddress: string): { baseG: string; id: string } {
   }
 
   return {
-    baseG: StrKey.encodeEd25519PublicKey(Buffer.from(pubkey)),
-    id: id.toString(),
+    baseG: StrKey.encodeEd25519PublicKey(pubkey),
+    id,
   };
 }
