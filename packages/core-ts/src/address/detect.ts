@@ -81,9 +81,29 @@ function crc16(bytes: Uint8Array): number {
 }
 
 /**
- * Detects the kind of a Stellar address.
- * Standard addresses (G, M, C) are validated using the Stellar SDK.
- * Custom M-addresses (0x60 format) are validated using internal logic.
+ * Detects the type of a Stellar address.
+ *
+ * The function classifies the input string into one of the following:
+ * - `"G"`: Ed25519 public key (standard account address)
+ * - `"M"`: Med25519 (muxed) account address
+ * - `"C"`: Contract address
+ * - `"invalid"`: Not a valid or recognized address
+ *
+ * Detection is performed in two stages:
+ * 1. Uses official `StrKey` validation methods for known address types.
+ * 2. Falls back to manual validation for muxed (`"M"`) addresses by:
+ *    - Decoding the Base32 string
+ *    - Verifying structure (length and version byte)
+ *    - Validating the CRC16 checksum
+ *
+ * @param address - The address string to evaluate.
+ * @returns A string indicating the detected address type or `"invalid"` if none match.
+ *
+ * @example
+ * detect("GBRPYHIL2C..."); // "G"
+ * detect("MA3D5F...");     // "M"
+ * detect("CA7Q...");       // "C"
+ * detect("invalid");       // "invalid"
  */
 export function detect(address: string): "G" | "M" | "C" | "invalid" {
   if (!address) return "invalid";
