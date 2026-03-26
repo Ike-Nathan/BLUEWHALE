@@ -3,16 +3,6 @@ import { StrKey } from "@stellar/stellar-sdk";
 const BASE32_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
 /**
- *  * Decodes a Base32-encoded string into a byte array.
- *
- * This function:
- * - Accepts a Base32 string (case-insensitive)
- * - Ignores padding characters (`=`)
- * - Converts the encoded data into its original binary form
- *
- * Internally, it processes the input in 5-bit chunks (Base32 encoding)
- * and reconstructs 8-bit bytes using a bit buffer.
- *
  * @param input - The Base32-encoded string to decode.
  * @returns A Uint8Array containing the decoded binary data.
  *
