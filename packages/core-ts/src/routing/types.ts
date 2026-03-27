@@ -60,16 +60,16 @@ export type Warning =
       message: string;
     };
 
-export type RoutingResult = {
-  destinationBaseAccount: string | null;
-  routingId: string | null; // decimal uint64 string — spec level
-  routingSource: RoutingSource;
-  warnings: Warning[]; // WarningCode only, always
-  destinationError?: {
-    code: ErrorCode;
-    message: string;
-  };
-};
+/**
+ * Standardized result for routing operations.
+ * Replaces the previous type-based implementation to ensure 
+ * consistent handling of 64-bit IDs and warnings.
+ */
+export interface RoutingResult {
+  source: RoutingSource;
+  id?: bigint;
+  warnings: Warning[];
+}
 
 export function routingIdAsBigInt(routingId: string | null): bigint | null {
   return routingId ? BigInt(routingId) : null;
