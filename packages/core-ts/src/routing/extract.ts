@@ -126,12 +126,18 @@ export function extractRouting(input: RoutingInput): RoutingResult {
   const warnings: Warning[] = [...parsed.warnings];
 
   if (input.memoType === "id") {
-    const norm = normalizeMemoTextId(input.memoValue ?? "");
-    routingId = norm.normalized;
-    routingSource = norm.normalized ? "memo" : "none";
-    warnings.push(...norm.warnings);
+    const rawValue = input.memoValue ?? "";
+    const norm = normalizeMemoTextId(rawValue);
 
-    if (!norm.normalized) {
+    if (norm.normalized) {
+      // Explicit bigint parsing for MEMO_ID to avoid Number precision issues.
+      const parsedMemoId = BigInt(norm.normalized);
+      routingId = parsedMemoId.toString();
+      routingSource = "memo";
+      warnings.push(...norm.warnings);
+    } else {
+      routingSource = "none";
+      warnings.push(...norm.warnings);
       warnings.push({
         code: "MEMO_ID_INVALID_FORMAT",
         severity: "warn",
@@ -234,7 +240,7 @@ function isGAddress(address: string): boolean {
  * @throws        `Error` when `address` is neither a valid G-address nor a
  *                valid M-address.
  */
-export function extractRouting(options: ExtractOptions): RoutingResult {
+export function extractRoutingLegacy(options: ExtractOptions): RoutingResult {
   const { address, incomingMemo } = options;
 
   // ── Branch 1: M-address ──────────────────────────────────────────────────
