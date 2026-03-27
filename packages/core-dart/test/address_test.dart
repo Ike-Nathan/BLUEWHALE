@@ -14,7 +14,7 @@ void main() {
 
     test('throws StellarAddressException for unexpected characters', () {
       // Contains non-base32 characters like '!' and spaces which are invalid in strkey.
-      const invalidAddress = 'GInvalid!@@@@@O000000000000000000000000000000000000';
+      const invalidAddress = 'GInvalid!@@@@@@O000000000000000000000000000000000000000';
       expect(
         () => StellarAddress.parse(invalidAddress),
         throwsA(isA<StellarAddressException>()),
@@ -23,7 +23,7 @@ void main() {
 
     test('throws StellarAddressException for invalid muxed address form', () {
       // M prefix but wrong length/payload, should not silently produce range errors.
-      const invalidMuxed = 'MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+      const invalidMuxed = 'MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
       expect(
         () => StellarAddress.parse(invalidMuxed),
         throwsA(isA<StellarAddressException>()),
@@ -64,6 +64,14 @@ void main() {
           'MAQAA5L65LSYH7CQWE7NNYSR42O4EFOA2OOYNDO643ZPNL6MQBBAAABBAAABBAAABBAAA';
       final result = StellarAddress.parse(validMuxed);
       expect(result.kind, equals(AddressKind.m));
+    });
+
+    test('identifies kind as contract for valid contract address', () {
+      const validContractAddress =
+          'CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSC4';
+      final result = StellarAddress.parse(validContractAddress);
+      expect(result.kind, equals(AddressKind.contract));
+      expect(result.value, equals(validContractAddress));
     });
   });
 }
