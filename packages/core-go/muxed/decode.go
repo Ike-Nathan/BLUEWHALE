@@ -2,37 +2,34 @@ package muxed
 
 import (
 	"encoding/binary"
+	"fmt"
 	"strconv"
 
 	"github.com/stellar-address-kit/core-go/address"
 )
 
+// muxedPayloadSize is the expected raw payload length after stripping the
+// version byte and checksum: 8 bytes (uint64 ID) + 32 bytes (Ed25519 key).
+const muxedPayloadSize = 40
+
 func DecodeMuxed(mAddress string) (string, string, error) {
-	versionByte, payload, err := address.DecodeStrKey(mAddress)
+	_, payload, err := address.DecodeStrKey(mAddress)
 	if err != nil {
 		return "", "", err
 	}
 
-	if versionByte != address.VersionByteM {
-		return "", "", ErrUnknownVersionByteError
+	if len(payload) != muxedPayloadSize {
+		return "", "", fmt.Errorf("invalid muxed address payload length: %d", len(payload))
 	}
 
-	// For muxed accounts, payload is: 32-byte pubkey + 8-byte memo ID
-	if len(payload) != 40 {
-		return "", "", ErrInvalidLengthError
-	}
+	// Muxed payload layout: [32-byte Ed25519 key][8-byte big-endian uint64 ID]
+	keyBytes := payload[:32]
+	id := binary.BigEndian.Uint64(payload[32:])
 
-	// Extract the 32-byte public key
-	pubkey := payload[:32]
-
-	// Extract the 8-byte memo ID (big endian)
-	memoID := binary.BigEndian.Uint64(payload[32:40])
-
-	// Encode the public key as a G address
-	baseG, err := address.EncodeStrKey(address.VersionByteG, pubkey)
+	baseG, err := address.EncodeStrKey(address.VersionByteG, keyBytes)
 	if err != nil {
 		return "", "", err
 	}
 
-	return baseG, strconv.FormatUint(memoID, 10), nil
+	return baseG, strconv.FormatUint(id, 10), nil
 }
