@@ -62,6 +62,17 @@ void main() {
       );
     });
 
+    test('memo source handles null values gracefully', () {
+      final result = RoutingResult(
+        routingSource: RoutingSource.memo,
+        warnings: [],
+      );
+      expect(
+        result.toDisplayString(),
+        equals('Memo routing: ID unknown'),
+      );
+    });
+
     test('none source formats as no routing', () {
       final result = RoutingResult(
         routingSource: RoutingSource.none,
