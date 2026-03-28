@@ -78,7 +78,7 @@ func ExtractRouting(input RoutingInput) RoutingResult {
 	}
 
 	if parsed.Kind == address.KindM {
-		baseG, idStr, err := muxed.DecodeMuxed(parsed.Raw)
+		baseG, id, err := muxed.DecodeMuxed(parsed.Raw)
 		if err != nil {
 			return RoutingResult{
 				RoutingSource: "none",
@@ -91,9 +91,8 @@ func ExtractRouting(input RoutingInput) RoutingResult {
 		}
 
 		warnings := []address.Warning{}
-		memoValue := input.MemoValue
 
-		if input.MemoType == "id" || (input.MemoType == "text" && digitsOnlyRegex.MatchString(memoValue)) {
+		if input.MemoType == "id" || (input.MemoType == "text" && digitsOnlyRegex.MatchString(input.MemoValue)) {
 			warnings = append(warnings, address.Warning{
 				Code:     address.WarnMemoPresentWithMuxed,
 				Severity: "warn",
@@ -107,10 +106,9 @@ func ExtractRouting(input RoutingInput) RoutingResult {
 			})
 		}
 
-		idVal, _ := strconv.ParseUint(idStr, 10, 64)
 		return RoutingResult{
 			DestinationBaseAccount: baseG,
-			RoutingID:              &idVal,
+			RoutingID:              &id,
 			RoutingSource:          "muxed",
 			Warnings:               warnings,
 		}
