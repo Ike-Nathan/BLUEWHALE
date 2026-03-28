@@ -16,9 +16,10 @@ func TestEncodeDecodeMuxedIsLosslessForUint64Max(t *testing.T) {
 	}
 
 	baseG := kp.Address()
-	id := strconv.FormatUint(math.MaxUint64, 10)
+	id := uint64(math.MaxUint64)
+	idStr := strconv.FormatUint(id, 10)
 
-	encoded, err := EncodeMuxed(baseG, id)
+	encoded, err := EncodeMuxed(baseG, idStr)
 	if err != nil {
 		t.Fatalf("EncodeMuxed returned error: %v", err)
 	}
@@ -33,7 +34,7 @@ func TestEncodeDecodeMuxedIsLosslessForUint64Max(t *testing.T) {
 	}
 
 	if decodedID != id {
-		t.Fatalf("decoded id mismatch: got %q want %q", decodedID, id)
+		t.Fatalf("decoded id mismatch: got %d want %d", decodedID, id)
 	}
 }
 
@@ -48,9 +49,10 @@ func TestEncodeMuxedWithJS53Boundary(t *testing.T) {
 
 	baseG := kp.Address()
 	// 2^53 + 1 = 9007199254740993 - JavaScript precision boundary
-	boundaryID := "9007199254740993"
+	boundaryID := uint64(9007199254740993)
+	boundaryIDStr := strconv.FormatUint(boundaryID, 10)
 
-	encoded, err := EncodeMuxed(baseG, boundaryID)
+	encoded, err := EncodeMuxed(baseG, boundaryIDStr)
 	if err != nil {
 		t.Fatalf("EncodeMuxed returned error: %v", err)
 	}
@@ -65,7 +67,7 @@ func TestEncodeMuxedWithJS53Boundary(t *testing.T) {
 	}
 
 	if decodedID != boundaryID {
-		t.Fatalf("decoded id mismatch: got %q want %q", decodedID, boundaryID)
+		t.Fatalf("decoded id mismatch: got %d want %d", decodedID, boundaryID)
 	}
 }
 
@@ -121,8 +123,8 @@ func TestEncodeMuxedJSONUnmarshalWithJS53Boundary(t *testing.T) {
 		t.Fatalf("decoded base account mismatch: got %q want %q", decodedBaseG, baseG)
 	}
 
-	if decodedID != boundaryIDStr {
-		t.Fatalf("decoded id mismatch: got %q want %q", decodedID, boundaryIDStr)
+	if decodedID != boundaryID {
+		t.Fatalf("decoded id mismatch: got %d want %d", decodedID, boundaryID)
 	}
 }
 
@@ -157,17 +159,7 @@ func TestEncodeMuxedUint64MaxRoundtrip(t *testing.T) {
 	}
 
 	// Verify ID matches exactly (bit-for-bit)
-	if decodedID != idStr {
-		t.Fatalf("decoded id mismatch: got %q want %q", decodedID, idStr)
-	}
-
-	// Additional validation: ensure the decoded ID can be converted back to uint64 without loss
-	decodedUint64, err := strconv.ParseUint(decodedID, 10, 64)
-	if err != nil {
-		t.Fatalf("ParseUint returned error: %v", err)
-	}
-
-	if decodedUint64 != maxUint64 {
-		t.Fatalf("uint64 round-trip precision loss: got %d want %d", decodedUint64, maxUint64)
+	if decodedID != maxUint64 {
+		t.Fatalf("decoded id mismatch: got %d want %d", decodedID, maxUint64)
 	}
 }

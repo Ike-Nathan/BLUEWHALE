@@ -32,11 +32,11 @@ func TestRoundtrip_Uint64EdgeCases(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			id := strconv.FormatUint(tt.id, 10)
+			idStr := strconv.FormatUint(tt.id, 10)
 
-			encoded, err := EncodeMuxed(baseG, id)
+			encoded, err := EncodeMuxed(baseG, idStr)
 			if err != nil {
-				t.Fatalf("EncodeMuxed(%q) returned error: %v", id, err)
+				t.Fatalf("EncodeMuxed(%q) returned error: %v", idStr, err)
 			}
 
 			decodedBaseG, decodedID, err := DecodeMuxed(encoded)
@@ -47,8 +47,8 @@ func TestRoundtrip_Uint64EdgeCases(t *testing.T) {
 			if decodedBaseG != baseG {
 				t.Errorf("base account mismatch: got %q want %q", decodedBaseG, baseG)
 			}
-			if decodedID != id {
-				t.Errorf("id mismatch: got %q want %q", decodedID, id)
+			if decodedID != tt.id {
+				t.Errorf("id mismatch: got %d want %d", decodedID, tt.id)
 			}
 		})
 	}
