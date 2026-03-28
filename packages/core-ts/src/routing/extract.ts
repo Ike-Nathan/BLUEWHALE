@@ -60,10 +60,6 @@ export function extractRouting(input: RoutingInput): RoutingResult {
       routingId: null,
       routingSource: "none",
       warnings: [],
-      destinationError: {
-        code: parsed.error.code,
-        message: parsed.error.message,
-      },
     };
   }
 
@@ -120,12 +116,18 @@ export function extractRouting(input: RoutingInput): RoutingResult {
   const warnings: Warning[] = [...parsed.warnings];
 
   if (input.memoType === "id") {
-    const norm = normalizeMemoTextId(input.memoValue ?? "");
-    routingId = norm.normalized;
-    routingSource = norm.normalized ? "memo" : "none";
-    warnings.push(...norm.warnings);
+    const rawValue = input.memoValue ?? "";
+    const norm = normalizeMemoTextId(rawValue);
 
-    if (!norm.normalized) {
+    if (norm.normalized) {
+      // Explicit bigint parsing for MEMO_ID to avoid Number precision issues.
+      const parsedMemoId = BigInt(norm.normalized);
+      routingId = parsedMemoId.toString();
+      routingSource = "memo";
+      warnings.push(...norm.warnings);
+    } else {
+      routingSource = "none";
+      warnings.push(...norm.warnings);
       warnings.push({
         code: "MEMO_ID_INVALID_FORMAT",
         severity: "warn",
