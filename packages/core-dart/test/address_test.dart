@@ -41,7 +41,7 @@ void main() {
 
     test('identifies kind as m for valid muxed address', () {
       const validMuxed =
-          'MAQAA5L65LSYH7CQWE7NNYSR42O4EFOA2OOYNDO643ZPNL6MQBBAAABBAAABBBAAABBAAA';
+          'MAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQACAAAAAAAAAAAAD672';
       final result = StellarAddress.parse(validMuxed);
       expect(result.kind, equals(AddressKind.m));
       expect(result.raw, equals(validMuxed));
@@ -61,7 +61,7 @@ void main() {
 
     test('identifies kind as m for valid muxed address', () {
       const validMuxed =
-          'MAQAA5L65LSYH7CQWE7NNYSR42O4EFOA2OOYNDO643ZPNL6MQBBAAABBAAABBAAABBAAA';
+          'MAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQACAAAAAAAAAAAAD672';
       final result = StellarAddress.parse(validMuxed);
       expect(result.kind, equals(AddressKind.m));
     });
@@ -70,8 +70,8 @@ void main() {
       const validContractAddress =
           'CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSC4';
       final result = StellarAddress.parse(validContractAddress);
-      expect(result.kind, equals(AddressKind.contract));
-      expect(result.value, equals(validContractAddress));
+      expect(result.kind, equals(AddressKind.c));
+      expect(result.raw, equals(validContractAddress));
     });
   });
 }
