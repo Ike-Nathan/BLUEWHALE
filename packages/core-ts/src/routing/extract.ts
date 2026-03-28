@@ -1,7 +1,6 @@
 import { RoutingInput, RoutingResult, Warning } from "./types";
 import { parse } from "../address/parse";
 import { AddressParseError } from "../address/errors";
-import { decodeMuxed } from "../muxed/decode";
 import { normalizeMemoTextId } from "./memo";
 
 export class ExtractRoutingError extends Error {
@@ -69,7 +68,6 @@ export function extractRouting(input: RoutingInput): RoutingResult {
   }
 
   if (parsed.kind === "C") {
-
     const warnings: Warning[] = [...parsed.warnings];
 
     warnings.push({
@@ -85,13 +83,9 @@ export function extractRouting(input: RoutingInput): RoutingResult {
       routingSource: "none",
       warnings,
     };
-
-    throw new ExtractRoutingError("Contract addresses cannot be routed");
-
   }
 
   if (parsed.kind === "M") {
-    const { baseG, id } = decodeMuxed(parsed.address);
     const warnings: Warning[] = [...parsed.warnings];
 
     if (
@@ -114,14 +108,14 @@ export function extractRouting(input: RoutingInput): RoutingResult {
     }
 
     return {
-      destinationBaseAccount: baseG,
-      routingId: id.toString(),
+      destinationBaseAccount: parsed.baseG,
+      routingId: parsed.muxedId,
       routingSource: "muxed",
       warnings,
     };
   }
 
-  let routingId: string | null = null;
+  let routingId: string | bigint | null = null;
   let routingSource: "none" | "memo" = "none";
   const warnings: Warning[] = [...parsed.warnings];
 
