@@ -3,7 +3,6 @@ package muxed
 import (
 	"encoding/binary"
 	"fmt"
-	"strconv"
 
 	"github.com/stellar-address-kit/core-go/address"
 )
@@ -12,14 +11,14 @@ import (
 // version byte and checksum: 8 bytes (uint64 ID) + 32 bytes (Ed25519 key).
 const muxedPayloadSize = 40
 
-func DecodeMuxed(mAddress string) (string, string, error) {
+func DecodeMuxed(mAddress string) (string, uint64, error) {
 	_, payload, err := address.DecodeStrKey(mAddress)
 	if err != nil {
-		return "", "", err
+		return "", 0, err
 	}
 
 	if len(payload) != muxedPayloadSize {
-		return "", "", fmt.Errorf("invalid muxed address payload length: %d", len(payload))
+		return "", 0, fmt.Errorf("invalid muxed address payload length: %d", len(payload))
 	}
 
 	// Muxed payload layout: [32-byte Ed25519 key][8-byte big-endian uint64 ID]
@@ -28,8 +27,8 @@ func DecodeMuxed(mAddress string) (string, string, error) {
 
 	baseG, err := address.EncodeStrKey(address.VersionByteG, keyBytes)
 	if err != nil {
-		return "", "", err
+		return "", 0, err
 	}
 
-	return baseG, strconv.FormatUint(id, 10), nil
+	return baseG, id, nil
 }
