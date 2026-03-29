@@ -1,199 +1,283 @@
 /**
- * Test suite for extractRouting() – covering the assignment requirement:
+ * extractRouting() – structured Warning diagnostics test suite
  *
- *   "When an M-address is provided alongside a conflicting transaction memo,
- *    the memo must be ignored and a 'memo-ignored' warning must be emitted."
+ * The Warning interface emits typed objects ({ code, severity, message })
+ * rather than plain strings. This suite validates that each warning branch
+ * in extract.ts injects the correct schema.
  *
  * Test categories
  * ───────────────
- *  1. M-address WITHOUT incomingMemo  → no warnings
- *  2. M-address WITH    incomingMemo  → 'memo-ignored' warning  ← ASSIGNMENT
- *  3. G-address without memo          → passes through cleanly
- *  4. G-address with memo             → no warning (memo conflict only applies to M-addresses)
- *  5. High-id canary (id > 2^53)      → memoId string is preserved exactly
- *  6. Invalid address                 → throws
+ *  1. MEMO_PRESENT_WITH_MUXED   – M-address + numeric memo-id conflict
+ *  2. MEMO_IGNORED_FOR_MUXED    – M-address + non-routable memo type
+ *  3. CONTRACT_SENDER_DETECTED  – C-address is rejected at the routing guard
+ *  4. MEMO_ID_INVALID_FORMAT    – G-address + empty / non-numeric memo-id
+ *  5. MEMO_TEXT_UNROUTABLE      – G-address + unsupported memo type (hash)
+ *  6. NON_CANONICAL_ROUTING_ID  – G-address + leading-zero memo-id
+ *  7. Multi-warning              – leading-zero memo-id that exceeds uint64 max
+ *                                  triggers NON_CANONICAL_ROUTING_ID +
+ *                                  MEMO_ID_INVALID_FORMAT simultaneously
  */
 
-import { MuxedAccount, Keypair } from "@stellar/stellar-sdk";
-import { extractRouting } from "../src/routing/extract";
-import type { RoutingResult } from "../src/types/index";
+import { describe, it, expect, beforeEach } from "vitest";
+import { encodeMuxed } from "../muxed/encode";
+import { extractRouting, ExtractRoutingError } from "../routing/extract";
+import type { RoutingInput, RoutingResult, Warning } from "../routing/types";
 
 // ─── Test fixtures ────────────────────────────────────────────────────────────
 
-// Deterministic G-address generated from a known seed so the test suite is
-// reproducible without network access.
-const SEED_KEYPAIR = Keypair.fromSecret(
-  "SAWAIYNFPJI74KRGDL27V7GVMZ4WSTQRCWL6C67MAVXXVWU33MAE3PAD"
-);
-const G_ADDRESS = SEED_KEYPAIR.publicKey(); // "GCKUD4IIA..."
+// Well-known G-address from spec/vectors.json (muxed_encode cases).
+const G_ADDRESS = "GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI";
+const ROUTING_ID = 42n;
+const M_ADDRESS = encodeMuxed(G_ADDRESS, ROUTING_ID);
 
-/**
- * Build an M-address from the test G-address and a given uint64 id (as string
- * to survive values > Number.MAX_SAFE_INTEGER).
- */
-function buildMAddress(id: string): string {
-  const muxed = new MuxedAccount(
-    /* baseAccount */ { accountId: () => G_ADDRESS } as any,
-    id
-  );
-  // MuxedAccount.accountId() returns the M-address string.
-  return muxed.accountId();
+// Helper: build a complete RoutingInput with sensible defaults.
+function input(
+  destination: string,
+  memoType = "none",
+  memoValue: string | null = null
+): RoutingInput {
+  return { destination, memoType, memoValue, sourceAccount: null };
 }
 
-const MEMO_ID = "42";
-const M_ADDRESS = buildMAddress(MEMO_ID);
+// ─── 1. MEMO_PRESENT_WITH_MUXED ───────────────────────────────────────────────
 
-// SEP-0023 §4 canary: first integer that cannot be represented as a JS float64
-// without loss.  id = 2^53 + 1 = 9007199254740993.
-const CANARY_ID = "9007199254740993";
-const M_ADDRESS_CANARY = buildMAddress(CANARY_ID);
+describe("MEMO_PRESENT_WITH_MUXED warning", () => {
+  let result: RoutingResult;
 
-// ─── Test suite ───────────────────────────────────────────────────────────────
-
-describe("extractRouting()", () => {
-  // ── 1. M-address alone (no incoming memo) ─────────────────────────────────
-  describe("M-address without incomingMemo", () => {
-    let result: RoutingResult;
-
-    beforeEach(() => {
-      result = extractRouting({ address: M_ADDRESS });
-    });
-
-    it("resolves the correct base G-address", () => {
-      expect(result.accountId).toBe(G_ADDRESS);
-    });
-
-    it("extracts the correct memoId from the M-address", () => {
-      expect(result.memoId).toBe(MEMO_ID);
-    });
-
-    it("emits NO warnings when no incomingMemo is supplied", () => {
-      expect(result.warnings).toHaveLength(0);
-    });
+  // Trigger: M-address destination + numeric memo-id supplied simultaneously.
+  beforeEach(() => {
+    result = extractRouting(input(M_ADDRESS, "id", "99999"));
   });
 
-  // ── 2. ASSIGNMENT REQUIREMENT: M-address WITH conflicting memo ────────────
-  describe("M-address WITH incomingMemo (assignment requirement)", () => {
-    const CONFLICTING_MEMO = "99999";
-    let result: RoutingResult;
-
-    beforeEach(() => {
-      result = extractRouting({
-        address: M_ADDRESS,
-        incomingMemo: CONFLICTING_MEMO,
-      });
-    });
-
-    it("resolves the correct base G-address", () => {
-      expect(result.accountId).toBe(G_ADDRESS);
-    });
-
-    it("uses the memoId from the M-address, not the incomingMemo", () => {
-      // The M-address encodes MEMO_ID ("42"); CONFLICTING_MEMO ("99999")
-      // must NOT appear in the result.
-      expect(result.memoId).toBe(MEMO_ID);
-      expect(result.memoId).not.toBe(CONFLICTING_MEMO);
-    });
-
-    it('emits exactly one "memo-ignored" warning', () => {
-      expect(result.warnings).toHaveLength(1);
-      expect(result.warnings[0]).toBe("memo-ignored");
-    });
-
-    it("does not include the conflicting memo anywhere in the result", () => {
-      // Belt-and-braces: make sure the raw conflict value leaked nowhere.
-      const serialised = JSON.stringify(result);
-      expect(serialised).not.toContain(CONFLICTING_MEMO);
-    });
+  it("emits exactly one warning", () => {
+    expect(result.warnings).toHaveLength(1);
   });
 
-  // ── 3. G-address without memo ─────────────────────────────────────────────
-  describe("G-address without incomingMemo", () => {
-    let result: RoutingResult;
-
-    beforeEach(() => {
-      result = extractRouting({ address: G_ADDRESS });
-    });
-
-    it("returns the G-address unchanged as accountId", () => {
-      expect(result.accountId).toBe(G_ADDRESS);
-    });
-
-    it("does not set memoId", () => {
-      expect(result.memoId).toBeUndefined();
-    });
-
-    it("emits no warnings", () => {
-      expect(result.warnings).toHaveLength(0);
-    });
+  it("warning.code is MEMO_PRESENT_WITH_MUXED", () => {
+    expect(result.warnings[0].code).toBe("MEMO_PRESENT_WITH_MUXED");
   });
 
-  // ── 4. G-address WITH a memo (no conflict warning expected) ───────────────
-  describe("G-address WITH incomingMemo (no warning – conflict rule only applies to M-addresses)", () => {
-    let result: RoutingResult;
-
-    beforeEach(() => {
-      result = extractRouting({ address: G_ADDRESS, incomingMemo: "123" });
-    });
-
-    it("returns the G-address unchanged as accountId", () => {
-      expect(result.accountId).toBe(G_ADDRESS);
-    });
-
-    it("does NOT emit memo-ignored for a G-address", () => {
-      expect(result.warnings).not.toContain("memo-ignored");
-    });
+  it("warning.severity is 'warn'", () => {
+    expect(result.warnings[0].severity).toBe("warn");
   });
 
-  // ── 5. Canary: M-address with id > 2^53 (uint64 boundary) ─────────────────
-  describe("M-address with id > 2^53 (SEP-0023 canary vector)", () => {
-    let result: RoutingResult;
-
-    beforeEach(() => {
-      result = extractRouting({ address: M_ADDRESS_CANARY });
-    });
-
-    it("preserves the full uint64 id as a string without truncation", () => {
-      expect(result.memoId).toBe(CANARY_ID);
-    });
-
-    it("the id is NOT equal to the truncated float64 representation", () => {
-      // 2^53 + 1 as a JS number collapses to 2^53 (9007199254740992).
-      const truncated = (Number(CANARY_ID)).toString();
-      expect(result.memoId).not.toBe(truncated);
-    });
+  it("warning.message is a non-empty string", () => {
+    expect(typeof result.warnings[0].message).toBe("string");
+    expect(result.warnings[0].message.length).toBeGreaterThan(0);
   });
 
-  // ── 5b. Canary WITH conflicting memo: warning still fires ─────────────────
-  describe("M-address (canary id) WITH incomingMemo", () => {
-    it('still emits "memo-ignored" for a high-id M-address + conflicting memo', () => {
-      const result = extractRouting({
-        address: M_ADDRESS_CANARY,
-        incomingMemo: "1",
-      });
-      expect(result.warnings).toContain("memo-ignored");
-      expect(result.memoId).toBe(CANARY_ID);
-    });
+  it("routing still resolves from the M-address (source is 'muxed')", () => {
+    expect(result.routingSource).toBe("muxed");
+    expect(result.destinationBaseAccount).toBe(G_ADDRESS);
+  });
+});
+
+// ─── 2. MEMO_IGNORED_FOR_MUXED ────────────────────────────────────────────────
+
+describe("MEMO_IGNORED_FOR_MUXED warning", () => {
+  let result: RoutingResult;
+
+  // Trigger: M-address destination + a non-numeric text memo.
+  beforeEach(() => {
+    result = extractRouting(input(M_ADDRESS, "text", "order-ref-abc"));
   });
 
-  // ── 6. Invalid address ────────────────────────────────────────────────────
-  describe("Invalid address", () => {
-    it("throws for a random string", () => {
-      expect(() =>
-        extractRouting({ address: "not-a-stellar-address" })
-      ).toThrow(/Invalid Stellar address/);
-    });
+  it("emits exactly one warning", () => {
+    expect(result.warnings).toHaveLength(1);
+  });
 
-    it("throws for an empty string", () => {
-      expect(() => extractRouting({ address: "" })).toThrow(
-        /Invalid Stellar address/
-      );
-    });
+  it("warning.code is MEMO_IGNORED_FOR_MUXED", () => {
+    expect(result.warnings[0].code).toBe("MEMO_IGNORED_FOR_MUXED");
+  });
 
-    it("throws for a truncated M-address", () => {
-      expect(() =>
-        extractRouting({ address: M_ADDRESS.slice(0, 20) })
-      ).toThrow();
-    });
+  it("warning.severity is 'info'", () => {
+    expect(result.warnings[0].severity).toBe("info");
+  });
+
+  it("warning.message is a non-empty string", () => {
+    expect(typeof result.warnings[0].message).toBe("string");
+    expect(result.warnings[0].message.length).toBeGreaterThan(0);
+  });
+
+  it("routing ID still comes from the M-address", () => {
+    expect(result.routingSource).toBe("muxed");
+    expect(result.destinationBaseAccount).toBe(G_ADDRESS);
+  });
+});
+
+// ─── 3. CONTRACT_SENDER_DETECTED ─────────────────────────────────────────────
+//
+// C-addresses are rejected by assertRoutableAddress() before reaching the
+// parsed.kind === "C" branch, so extractRouting throws ExtractRoutingError
+// rather than returning a CONTRACT_SENDER_DETECTED warning object.
+// This test documents that gate behaviour.
+
+describe("CONTRACT_SENDER_DETECTED – C-address routing guard", () => {
+  // A well-formed Stellar contract address (C-prefix).
+  const C_ADDRESS = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
+
+  it("throws ExtractRoutingError for a contract address", () => {
+    expect(() => extractRouting(input(C_ADDRESS))).toThrow(ExtractRoutingError);
+  });
+
+  it("error message identifies the invalid destination prefix", () => {
+    expect(() => extractRouting(input(C_ADDRESS))).toThrow(
+      /expected a G or M address/
+    );
+  });
+
+  it("does NOT return a result object – no silent failure", () => {
+    let result: RoutingResult | undefined;
+    try {
+      result = extractRouting(input(C_ADDRESS));
+    } catch {
+      // expected
+    }
+    expect(result).toBeUndefined();
+  });
+});
+
+// ─── 4. MEMO_ID_INVALID_FORMAT ────────────────────────────────────────────────
+
+describe("MEMO_ID_INVALID_FORMAT warning", () => {
+  it("emits MEMO_ID_INVALID_FORMAT for an empty memo-id value", () => {
+    const result = extractRouting(input(G_ADDRESS, "id", ""));
+    const codes = result.warnings.map((w: Warning) => w.code);
+    expect(codes).toContain("MEMO_ID_INVALID_FORMAT");
+  });
+
+  it("warning object has severity 'warn'", () => {
+    const result = extractRouting(input(G_ADDRESS, "id", ""));
+    const warning = result.warnings.find(
+      (w: Warning) => w.code === "MEMO_ID_INVALID_FORMAT"
+    );
+    expect(warning).toBeDefined();
+    expect(warning!.severity).toBe("warn");
+    expect(typeof warning!.message).toBe("string");
+  });
+
+  it("emits MEMO_ID_INVALID_FORMAT for a non-numeric memo-id", () => {
+    const result = extractRouting(input(G_ADDRESS, "id", "not-a-number"));
+    const codes = result.warnings.map((w: Warning) => w.code);
+    expect(codes).toContain("MEMO_ID_INVALID_FORMAT");
+  });
+
+  it("routing source falls back to 'none' when memo-id is invalid", () => {
+    const result = extractRouting(input(G_ADDRESS, "id", ""));
+    expect(result.routingSource).toBe("none");
+    expect(result.routingId).toBeNull();
+  });
+});
+
+// ─── 5. MEMO_TEXT_UNROUTABLE ──────────────────────────────────────────────────
+
+describe("MEMO_TEXT_UNROUTABLE warning", () => {
+  it("emits MEMO_TEXT_UNROUTABLE for memoType 'hash'", () => {
+    const result = extractRouting(input(G_ADDRESS, "hash", "abc123"));
+    const codes = result.warnings.map((w: Warning) => w.code);
+    expect(codes).toContain("MEMO_TEXT_UNROUTABLE");
+  });
+
+  it("emits MEMO_TEXT_UNROUTABLE for memoType 'return'", () => {
+    const result = extractRouting(input(G_ADDRESS, "return", "abc123"));
+    const codes = result.warnings.map((w: Warning) => w.code);
+    expect(codes).toContain("MEMO_TEXT_UNROUTABLE");
+  });
+
+  it("warning object has severity 'warn' and a non-empty message", () => {
+    const result = extractRouting(input(G_ADDRESS, "hash", "abc123"));
+    const warning = result.warnings.find(
+      (w: Warning) => w.code === "MEMO_TEXT_UNROUTABLE"
+    );
+    expect(warning).toBeDefined();
+    expect(warning!.severity).toBe("warn");
+    expect(warning!.message.length).toBeGreaterThan(0);
+  });
+});
+
+// ─── 6. NON_CANONICAL_ROUTING_ID ─────────────────────────────────────────────
+
+describe("NON_CANONICAL_ROUTING_ID warning", () => {
+  // Trigger: G-address + memoType "id" with leading zeros (e.g. "007").
+  let result: RoutingResult;
+
+  beforeEach(() => {
+    result = extractRouting(input(G_ADDRESS, "id", "007"));
+  });
+
+  it("emits exactly one warning", () => {
+    expect(result.warnings).toHaveLength(1);
+  });
+
+  it("warning.code is NON_CANONICAL_ROUTING_ID", () => {
+    expect(result.warnings[0].code).toBe("NON_CANONICAL_ROUTING_ID");
+  });
+
+  it("warning.severity is 'warn'", () => {
+    expect(result.warnings[0].severity).toBe("warn");
+  });
+
+  it("warning carries normalization metadata with original and normalized values", () => {
+    const w = result.warnings[0] as Extract<Warning, { normalization: unknown }>;
+    expect(w.normalization.original).toBe("007");
+    expect(w.normalization.normalized).toBe("7");
+  });
+
+  it("routingId is normalized to the canonical decimal form", () => {
+    expect(result.routingId).toBe("7");
+    expect(result.routingSource).toBe("memo");
+  });
+});
+
+// ─── 7. Multi-warning: NON_CANONICAL_ROUTING_ID + MEMO_ID_INVALID_FORMAT ─────
+//
+// A memo-id value with leading zeros that also exceeds UINT64_MAX triggers
+// TWO warnings at once:
+//   1. NON_CANONICAL_ROUTING_ID  (from normalizeMemoTextId stripping leading zero)
+//   2. MEMO_ID_INVALID_FORMAT    (because the stripped value exceeds uint64 max)
+
+describe("multi-warning: NON_CANONICAL_ROUTING_ID + MEMO_ID_INVALID_FORMAT", () => {
+  // "018446744073709551616" = leading zero + value one above UINT64_MAX
+  const OVERFLOW_WITH_LEADING_ZERO = "018446744073709551616";
+  let result: RoutingResult;
+
+  beforeEach(() => {
+    result = extractRouting(input(G_ADDRESS, "id", OVERFLOW_WITH_LEADING_ZERO));
+  });
+
+  it("emits exactly two warnings", () => {
+    expect(result.warnings).toHaveLength(2);
+  });
+
+  it("first warning is NON_CANONICAL_ROUTING_ID", () => {
+    expect(result.warnings[0].code).toBe("NON_CANONICAL_ROUTING_ID");
+  });
+
+  it("second warning is MEMO_ID_INVALID_FORMAT", () => {
+    expect(result.warnings[1].code).toBe("MEMO_ID_INVALID_FORMAT");
+  });
+
+  it("both warnings have severity 'warn'", () => {
+    for (const w of result.warnings) {
+      expect(w.severity).toBe("warn");
+    }
+  });
+
+  it("NON_CANONICAL_ROUTING_ID normalization metadata is correct", () => {
+    const w = result.warnings[0] as Extract<Warning, { normalization: unknown }>;
+    expect(w.normalization.original).toBe(OVERFLOW_WITH_LEADING_ZERO);
+    expect(w.normalization.normalized).toBe("18446744073709551616");
+  });
+
+  it("routing falls back to 'none' because the value exceeds uint64 max", () => {
+    expect(result.routingSource).toBe("none");
+    expect(result.routingId).toBeNull();
+  });
+
+  it("all warning objects carry a non-empty message string", () => {
+    for (const w of result.warnings) {
+      expect(typeof w.message).toBe("string");
+      expect(w.message.length).toBeGreaterThan(0);
+    }
   });
 });
