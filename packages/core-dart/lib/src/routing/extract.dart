@@ -51,8 +51,8 @@ RoutingResult extractRouting(RoutingInput input) {
   if (parsed.kind == AddressKind.m) {
     final warnings = List<Warning>.from(parsed.warnings);
     final decoded = MuxedDecoder.decodeMuxedString(parsed.address);
-    final baseG = decoded['baseG'] as String;
-    final muxedId = (decoded['id'] as BigInt).toString();
+    final baseG = decoded.baseG;
+    final muxedId = decoded.id.toString();
 
     if (input.memoType == 'none') {
       return RoutingResult(

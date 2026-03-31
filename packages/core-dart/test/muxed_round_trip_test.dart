@@ -11,7 +11,7 @@ BigInt _randomUint64(Random rng) {
   // Build 64 random bits from two 32-bit values.
   final hi = BigInt.from(rng.nextInt(1 << 32));
   final lo = BigInt.from(rng.nextInt(1 << 32));
-  return (hi << 32) | lo;
+  return (hi << 32) + lo;
 }
 
 void main() {
@@ -20,7 +20,7 @@ void main() {
   // Feature: muxed-decode-typed-dto, Property 1: Construction preserves field values
   // For any baseG string and BigInt id, DecodedMuxedAddress(baseG, id).baseG == baseG and .id == id
   group('Property 1: Construction preserves field values', () {
-    test('field values are preserved across $\_iterations random instances', () {
+    test('field values are preserved across $_iterations random instances', () {
       for (var i = 0; i < _iterations; i++) {
         final id = _randomUint64(rng);
         final dto = DecodedMuxedAddress(baseG: _baseG, id: id);
@@ -43,7 +43,7 @@ void main() {
   // Feature: muxed-decode-typed-dto, Property 2: Equality and hashCode consistency
   // For any two DecodedMuxedAddress instances, == and hashCode are consistent with field equality
   group('Property 2: Equality and hashCode consistency', () {
-    test('equal instances have equal hashCode across $\_iterations pairs', () {
+    test('equal instances have equal hashCode across $_iterations pairs', () {
       for (var i = 0; i < _iterations; i++) {
         final id = _randomUint64(rng);
         final a = DecodedMuxedAddress(baseG: _baseG, id: id);
@@ -68,7 +68,7 @@ void main() {
   // Feature: muxed-decode-typed-dto, Property 3: toString contains both fields
   // For any DecodedMuxedAddress, toString() contains baseG and id
   group('Property 3: toString contains both fields', () {
-    test('toString contains baseG and id across $\_iterations instances', () {
+    test('toString contains baseG and id across $_iterations instances', () {
       for (var i = 0; i < _iterations; i++) {
         final id = _randomUint64(rng);
         final dto = DecodedMuxedAddress(baseG: _baseG, id: id);
@@ -84,7 +84,7 @@ void main() {
   // Feature: muxed-decode-typed-dto, Property 4: Round-trip encode → decode → encode
   // For any valid baseG and uint64 id, encode then decode then re-encode is identity
   group('Property 4: Round-trip encode → decode → encode', () {
-    test('round-trip preserves baseG and id across $\_iterations random ids',
+    test('round-trip preserves baseG and id across $_iterations random ids',
         () {
       for (var i = 0; i < _iterations; i++) {
         final id = _randomUint64(rng);

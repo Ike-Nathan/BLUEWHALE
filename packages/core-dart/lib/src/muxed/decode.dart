@@ -1,10 +1,20 @@
 import 'dart:typed_data';
 import '../util/strkey.dart';
 import 'decoded_muxed_address.dart';
+import '../exceptions.dart';
 
 class MuxedDecoder {
   static DecodedMuxedAddress decodeMuxedString(String mAddress) {
     final decoded = StrKeyUtil.decodeBase32(mAddress);
+    
+    if (decoded.length != 43) {
+      throw const StellarAddressException('Invalid muxed address length');
+    }
+    
+    if (decoded[0] != 0x60) {
+      throw const StellarAddressException('Invalid muxed address prefix');
+    }
+
     // Payload starts at index 1 (skip version byte 0x60)
     // 32 bytes pubkey + 8 bytes ID = 40 bytes
     final pubkey = decoded.sublist(1, 33);
