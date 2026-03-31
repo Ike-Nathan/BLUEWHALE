@@ -1,8 +1,8 @@
 import 'package:meta/meta.dart';
-import '../address/codes.dart';
 import '../muxed/decode.dart';
-import '../address/detect.dart';
 import '../exceptions.dart';
+import 'codes.dart';
+import 'detect.dart';
 
 /// An immutable representation of a Stellar Address.
 @immutable
@@ -65,8 +65,8 @@ class StellarAddress {
       return StellarAddress._(
         kind: AddressKind.m,
         raw: address,
-        baseG: decoded['baseG'] as String?,
-        muxedId: decoded['id'] as BigInt?,
+        baseG: decoded.baseG,
+        muxedId: decoded.id,
       );
     } catch (error) {
       throw StellarAddressException(
