@@ -16,9 +16,10 @@ const (
 //   - For muxed addresses (KindM), BaseG is the underlying G-address and
 //     MuxedID is the 64-bit ID carried by the muxed account.
 type Address struct {
-	Kind    AddressKind
-	Raw     string
-	BaseG   string
-	MuxedID uint64
+	Kind     AddressKind
+	Raw      string
+	BaseG    string
+	MuxedID  uint64
+	Warnings []Warning
 }
 

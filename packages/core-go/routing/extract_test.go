@@ -40,7 +40,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 			expected: RoutingResult{
 				DestinationBaseAccount: testBaseG,
-				RoutingID:              ptrUint64(100),
+				RoutingID:              NewRoutingID("100"),
 				RoutingSource:          "memo",
 				Warnings:               []address.Warning{},
 			},
@@ -54,7 +54,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 			expected: RoutingResult{
 				DestinationBaseAccount: testBaseG,
-				RoutingID:              ptrUint64(0),
+				RoutingID:              NewRoutingID("0"),
 				RoutingSource:          "memo",
 				Warnings:               []address.Warning{},
 			},
@@ -68,7 +68,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 			expected: RoutingResult{
 				DestinationBaseAccount: testBaseG,
-				RoutingID:              ptrUint64(18446744073709551615),
+				RoutingID:              NewRoutingID("18446744073709551615"),
 				RoutingSource:          "memo",
 				Warnings:               []address.Warning{},
 			},
@@ -142,7 +142,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 			expected: RoutingResult{
 				DestinationBaseAccount: testBaseG,
-				RoutingID:              ptrUint64(7),
+				RoutingID:              NewRoutingID("7"),
 				RoutingSource:          "memo",
 				Warnings: []address.Warning{
 					{
@@ -166,7 +166,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 			expected: RoutingResult{
 				DestinationBaseAccount: testBaseG,
-				RoutingID:              ptrUint64(200),
+				RoutingID:              NewRoutingID("200"),
 				RoutingSource:          "memo",
 				Warnings:               []address.Warning{},
 			},
@@ -198,7 +198,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			name: "memo-return",
 			input: RoutingInput{
 				Destination: testBaseG,
-				MemoType:    "MEMO_RETURN",
+				MemoType:    "return",
 				MemoValue:   "also-not-a-routing-id",
 			},
 			expected: RoutingResult{
@@ -248,7 +248,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 			expected: RoutingResult{
 				DestinationBaseAccount: testBaseG,
-				RoutingID:              ptrUint64(9007199254740993),
+				RoutingID:              NewRoutingID("9007199254740993"),
 				RoutingSource:          "muxed",
 				Warnings:               []address.Warning{},
 			},
@@ -262,7 +262,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 			expected: RoutingResult{
 				DestinationBaseAccount: testBaseG,
-				RoutingID:              ptrUint64(9007199254740993),
+				RoutingID:              NewRoutingID("9007199254740993"),
 				RoutingSource:          "muxed",
 				Warnings: []address.Warning{
 					{
@@ -282,7 +282,7 @@ func TestExtractRouting_RoutingMatrix(t *testing.T) {
 			},
 			expected: RoutingResult{
 				DestinationBaseAccount: testBaseG,
-				RoutingID:              ptrUint64(9007199254740993),
+				RoutingID:              NewRoutingID("9007199254740993"),
 				RoutingSource:          "muxed",
 				Warnings: []address.Warning{
 					{
@@ -331,36 +331,32 @@ func TestExtractRouting_ContractSourceClearsRoutingState(t *testing.T) {
 	})
 }
 
-func ptrUint64(v uint64) *uint64 {
-	return &v
-}
-
 func assertRoutingResult(t *testing.T, got, want RoutingResult) {
 	t.Helper()
 
 	if got.DestinationBaseAccount != want.DestinationBaseAccount {
 		t.Errorf("DestinationBaseAccount = %v, want %v", got.DestinationBaseAccount, want.DestinationBaseAccount)
 	}
-	if !uint64PtrEqual(got.RoutingID, want.RoutingID) {
-		t.Errorf("RoutingID = %v, want %v", got.RoutingID, want.RoutingID)
+	if !routingIDEqual(got.RoutingID, want.RoutingID) {
+		t.Errorf("RoutingID = %v, want %v", got.RoutingID.String(), want.RoutingID.String())
 	}
 	if got.RoutingSource != want.RoutingSource {
 		t.Errorf("RoutingSource = %v, want %v", got.RoutingSource, want.RoutingSource)
 	}
 	if !reflect.DeepEqual(got.Warnings, want.Warnings) {
-		t.Errorf("Warnings = %#v, want %#v", got.Warnings, want.Warnings)
+		t.Errorf("Warnings = %#+v, want %#+v", got.Warnings, want.Warnings)
 	}
 	if !reflect.DeepEqual(got.DestinationError, want.DestinationError) {
 		t.Errorf("DestinationError = %#v, want %#v", got.DestinationError, want.DestinationError)
 	}
 }
 
-func uint64PtrEqual(a, b *uint64) bool {
+func routingIDEqual(a, b *RoutingID) bool {
 	if a == nil && b == nil {
 		return true
 	}
 	if a == nil || b == nil {
 		return false
 	}
-	return *a == *b
+	return a.String() == b.String()
 }

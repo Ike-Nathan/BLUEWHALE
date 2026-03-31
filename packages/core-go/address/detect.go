@@ -1,20 +1,20 @@
 package address
 
+// Detect identifies the AddressKind of a Stellar address string.
 func Detect(addr string) (AddressKind, error) {
 	versionByte, _, err := DecodeStrKey(addr)
 	if err != nil {
 		return "", err
 	}
 
-func Detect(address string) string {
-	if strkey.IsValidEd25519PublicKey(address) {
-		return "G"
+	switch versionByte {
+	case VersionByteG:
+		return KindG, nil
+	case VersionByteM:
+		return KindM, nil
+	case VersionByteC:
+		return KindC, nil
+	default:
+		return "", ErrUnknownVersionByteError
 	}
-	if strkey.IsValidMuxedAccountEd25519PublicKey(address) {
-		return "M"
-	}
-	if _, err := strkey.Decode(strkey.VersionByteContract, address); err == nil {
-		return "C"
-	}
-	return "invalid"
 }
