@@ -62,6 +62,26 @@ All three language implementations are validated against the same `spec/vectors.
 > **Note:** Packages are not yet published to any registry. This project is under active development. Clone the repo to explore the implementations locally.
 
 
+## Documentation & Guides
+
+We provide language-specific guides tailored to your role:
+
+**For Backend Developers (Go, Node.js)**
+- [Go: Deposit Routing Service Integration](./docs/guides/go-deposit-routing-service.md)
+- [Go: Running the Spec Validator](./docs/guides/go-running-spec-validator.md)
+- [TypeScript: Pooled Accounts & Muxed Deposits](./docs/guides/pooled-accounts-muxed-deposits.md)
+- [TypeScript: Reconciling Deposits with Missing Memos](./docs/guides/reconciling-deposits-missing-memo.md)
+
+**For Wallet Developers (Dart / Flutter)**
+- [Flutter: Displaying Deposit Addresses](./docs/guides/flutter-displaying-deposit-addresses.md)
+- [Flutter: Handling Incoming Payments](./docs/guides/flutter-handling-incoming-payments.md)
+- [Flutter: Web BigInt Considerations](./docs/guides/flutter-web-bigint.md)
+
+**Migration Guides**
+- [Migrating Memo to Muxed](./docs/guides/migrating-memo-to-muxed.md)
+- [Compatibility Reference](./docs/guides/compatibility-reference.md)
+
+
 ## Routing Reference
 
 | Scenario | routingSource | Warnings | Recommended Action |

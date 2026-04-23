@@ -1,4 +1,5 @@
-import { RoutingInput, RoutingResult, Warning } from "./types";
+import { RoutingInput, RoutingResult } from "./types";
+import { Warning } from "../address/types";
 import { parse } from "../address/parse";
 import { AddressParseError } from "../address/errors";
 import { normalizeMemoTextId } from "./memo";

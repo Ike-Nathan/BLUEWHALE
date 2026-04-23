@@ -1,4 +1,4 @@
-import { Warning } from "./types";
+import { Warning } from "../address/types";
 
 export type NormalizeResult = {
   normalized: string | null;
