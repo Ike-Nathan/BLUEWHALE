@@ -50,16 +50,14 @@ The Stellar SDK exposes the primitives. This library encodes the routing policy 
 
 ## Packages
 
-| Package | Language | Purpose |
-|---------|----------|---------|
-| `stellar-address-kit` | TypeScript | Reference implementation |
-| `core-go` | Go | Backend deposit routing, builds on `github.com/stellar/go/strkey`, zero new deps for Stellar Go shops |
-| `stellar_address_kit` | Dart / Flutter | Wallet applications |
-| `@stellar-address-kit/spec` |, | Shared spec artifact (`vectors.json` + `schema.json`) |
+| Package | Language | Registry | Purpose |
+|---------|----------|----------|---------|
+| `stellar-address-kit` | TypeScript | [NPM](https://www.npmjs.com/package/stellar-address-kit) | Reference implementation |
+| `stellar_address_kit` | Dart / Flutter | [Pub.dev](https://pub.dev/packages/stellar_address_kit) | Wallet applications |
+| `core-go` | Go | [Go Modules](https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go) | Backend deposit routing |
+| `@stellar-address-kit/spec` |, | Shared | Shared spec artifact (`vectors.json` + `schema.json`) |
 
 All three language implementations are validated against the same `spec/vectors.json`. If a vector passes in TypeScript, it passes identically in Go and Dart. The spec lives at `spec/` in the repo root, it is the source of truth.
-
-> **Note:** Packages are not yet published to any registry. This project is under active development. Clone the repo to explore the implementations locally.
 
 
 ## Documentation & Guides
@@ -283,13 +281,14 @@ When the SDK improves its primitives, this library gets better for free. The SDK
 
 | Component | Status |
 |-----------|--------|
-| spec/vectors.json | In development |
-| stellar-address-kit (TypeScript) | In development |
-| core-go (Go) | In development |
-| stellar_address_kit (Dart) | In development |
-| @stellar-address-kit/spec | In development |
+| spec/vectors.json | v1.0.0 Stable |
+| stellar-address-kit (TypeScript) | [v1.0.0 Released](https://www.npmjs.com/package/stellar-address-kit) |
+| core-go (Go) | [v1.0.0 Released](https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go) |
+| stellar_address_kit (Dart) | [v1.0.0 Released](https://pub.dev/packages/stellar_address_kit) |
+| @stellar-address-kit/spec | v1.0.0 Stable |
 
-> This project is under active development. No packages have been published yet. Contributions, feedback, and early integration interest are welcome.
+> This project is now live! All three language implementations are released and ready for production integration. Contributions and feedback are welcome.
+
 
 
 ## License
