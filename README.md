@@ -1,11 +1,6 @@
-<p align="center">
-  <img src="stellar_address_kit_logo_1777022090492.png" width="220" alt="Stellar Address Kit Logo" />
-</p>
-
 <h1 align="center">Stellar Address Kit</h1>
 
 <p align="center">
-  <a href="https://github.com/Boxkit-Labs/stellar-address-kit/actions"><img src="https://github.com/Boxkit-Labs/stellar-address-kit/actions/workflows/ci.yml/badge.svg" alt="CI Status"></a>
   <a href="https://pub.dev/packages/stellar_address_kit"><img src="https://img.shields.io/pub/v/stellar_address_kit.svg" alt="Pub.dev"></a>
   <a href="https://www.npmjs.com/package/stellar-address-kit"><img src="https://img.shields.io/npm/v/stellar-address-kit.svg" alt="NPM"></a>
   <a href="https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go"><img src="https://img.shields.io/badge/go-reference-blue?logo=go" alt="Go Reference"></a>
@@ -16,18 +11,6 @@
   <b>The deposit routing & address interop spec for Stellar (G/M/C + memos).</b><br/>
   Validated identically across <b>TypeScript</b>, <b>Go</b>, and <b>Dart</b>.
 </p>
-
----
-
-<p align="center">
-  <a href="CODE_OF_CONDUCT.md">Code of Conduct</a> •
-  <a href="CONTRIBUTING.md">Contributing</a> •
-  <a href="SECURITY.md">Security</a> •
-  <a href="LICENSE">License</a>
-</p>
-
----
-
 
 ## Project Structure
 
@@ -52,21 +35,19 @@ stellar-address-kit/
 └── .changeset/          # Coordinated versioning configuration
 ```
 
-
 ## Why This Exists
 
 Stellar has three address types that coexist in real payment flows:
 
-| Prefix | Type | Used For |
-|--------|------|----------|
-| G… | Classic account | Standard payments |
-| M… | Muxed account | Pooled accounts, exchange subaccounts, G address + embedded 64-bit ID |
-| C… | Contract address | Soroban smart contracts, not a valid destination for classic payment routing |
+| Prefix | Type             | Used For                                                                     |
+| ------ | ---------------- | ---------------------------------------------------------------------------- |
+| G…     | Classic account  | Standard payments                                                            |
+| M…     | Muxed account    | Pooled accounts, exchange subaccounts, G address + embedded 64-bit ID        |
+| C…     | Contract address | Soroban smart contracts, not a valid destination for classic payment routing |
 
 Routing a deposit correctly requires knowing which type you received, whether to read the routing identifier from the muxed ID or the memo field, and what to do when both are present, or neither. Getting this wrong causes lost deposits.
 
 The Stellar SDK exposes the primitives. This library encodes the routing policy on top of them, which is the part that exchanges, wallets and payment platforms implement differently, inconsistently and sometimes incorrectly. See Stellar's [pooled account](https://developers.stellar.org) and [muxed account](https://developers.stellar.org) guidance for the underlying motivation.
-
 
 ## What This Library Does NOT Do
 
@@ -75,59 +56,58 @@ The Stellar SDK exposes the primitives. This library encodes the routing policy 
 - Does not parse full transaction XDR, caller supplies `RoutingInput` from their own transaction parsing
 - Does not wrap or replace `@stellar/stellar-sdk`, it depends on it
 
-
 ## Packages
 
-| Package | Language | Registry | Purpose |
-|---------|----------|----------|---------|
-| `stellar-address-kit` | TypeScript | [NPM](https://www.npmjs.com/package/stellar-address-kit) | Reference implementation |
-| `stellar_address_kit` | Dart / Flutter | [Pub.dev](https://pub.dev/packages/stellar_address_kit) | Wallet applications |
-| `core-go` | Go | [Go Modules](https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go) | Backend deposit routing |
-| `@stellar-address-kit/spec` |, | Shared | Shared spec artifact (`vectors.json` + `schema.json`) |
+| Package                     | Language       | Registry                                                                                     | Purpose                                               |
+| --------------------------- | -------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `stellar-address-kit`       | TypeScript     | [NPM](https://www.npmjs.com/package/stellar-address-kit)                                     | Reference implementation                              |
+| `stellar_address_kit`       | Dart / Flutter | [Pub.dev](https://pub.dev/packages/stellar_address_kit)                                      | Wallet applications                                   |
+| `core-go`                   | Go             | [Go Modules](https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go) | Backend deposit routing                               |
+| `@stellar-address-kit/spec` | ,              | Shared                                                                                       | Shared spec artifact (`vectors.json` + `schema.json`) |
 
 All three language implementations are validated against the same `spec/vectors.json`. If a vector passes in TypeScript, it passes identically in Go and Dart. The spec lives at `spec/` in the repo root, it is the source of truth.
-
 
 ## Documentation & Guides
 
 We provide language-specific guides tailored to your role:
 
 **For Backend Developers (Go, Node.js)**
+
 - [Go: Deposit Routing Service Integration](./docs/guides/go-deposit-routing-service.md)
 - [Go: Running the Spec Validator](./docs/guides/go-running-spec-validator.md)
 - [TypeScript: Pooled Accounts & Muxed Deposits](./docs/guides/pooled-accounts-muxed-deposits.md)
 - [TypeScript: Reconciling Deposits with Missing Memos](./docs/guides/reconciling-deposits-missing-memo.md)
 
 **For Wallet Developers (Dart / Flutter)**
+
 - [Flutter: Displaying Deposit Addresses](./docs/guides/flutter-displaying-deposit-addresses.md)
 - [Flutter: Handling Incoming Payments](./docs/guides/flutter-handling-incoming-payments.md)
 - [Flutter: Web BigInt Considerations](./docs/guides/flutter-web-bigint.md)
 
 **Migration Guides**
+
 - [Migrating Memo to Muxed](./docs/guides/migrating-memo-to-muxed.md)
 - [Compatibility Reference](./docs/guides/compatibility-reference.md)
 
-
 ## Routing Reference
 
-| Scenario | routingSource | Warnings | Recommended Action |
-|----------|--------------|----------|--------------------|
-| M address, no memo | muxed |, | Route via muxed ID |
-| M address + routing memo also present | muxed | MEMO_PRESENT_WITH_MUXED (warn) | Route muxed, investigate sender |
-| M address + harmless memo | muxed | MEMO_IGNORED_FOR_MUXED (info) | Route muxed |
-| G address + MEMO_ID | memo |, | Route via memo ID |
-| G address + MEMO_ID with leading zeros | memo | NON_CANONICAL_ROUTING_ID (warn) + normalization payload | Route normalized value, log |
-| G address + MEMO_ID invalid format (empty, non-numeric, overflow) | none | MEMO_ID_INVALID_FORMAT (warn) | Manual review |
-| G address + numeric MEMO_TEXT | memo |, | Route via parsed ID |
-| G address + MEMO_TEXT with leading zeros | memo | NON_CANONICAL_ROUTING_ID (warn) + normalization payload | Route normalized value, log |
-| G address + non-numeric MEMO_TEXT | none | MEMO_TEXT_UNROUTABLE (warn) | Manual review |
-| G address + MEMO_HASH or MEMO_RETURN | none | UNSUPPORTED_MEMO_TYPE (warn) | Manual review |
-| G address + no memo | none |, | Manual review |
-| Unknown memoType string | none | UNSUPPORTED_MEMO_TYPE (warn) with `context: { memoType: 'unknown' }` | Manual review |
-| Contract sender + no routing ID | none | CONTRACT_SENDER_DETECTED + INVALID_DESTINATION (error) | Alert immediately |
-| C address as destination | none | INVALID_DESTINATION (error) | Alert immediately, always |
-| Unparseable destination | none |, | destinationError.code explains why |
-
+| Scenario                                                          | routingSource | Warnings                                                             | Recommended Action                 |
+| ----------------------------------------------------------------- | ------------- | -------------------------------------------------------------------- | ---------------------------------- |
+| M address, no memo                                                | muxed         | ,                                                                    | Route via muxed ID                 |
+| M address + routing memo also present                             | muxed         | MEMO_PRESENT_WITH_MUXED (warn)                                       | Route muxed, investigate sender    |
+| M address + harmless memo                                         | muxed         | MEMO_IGNORED_FOR_MUXED (info)                                        | Route muxed                        |
+| G address + MEMO_ID                                               | memo          | ,                                                                    | Route via memo ID                  |
+| G address + MEMO_ID with leading zeros                            | memo          | NON_CANONICAL_ROUTING_ID (warn) + normalization payload              | Route normalized value, log        |
+| G address + MEMO_ID invalid format (empty, non-numeric, overflow) | none          | MEMO_ID_INVALID_FORMAT (warn)                                        | Manual review                      |
+| G address + numeric MEMO_TEXT                                     | memo          | ,                                                                    | Route via parsed ID                |
+| G address + MEMO_TEXT with leading zeros                          | memo          | NON_CANONICAL_ROUTING_ID (warn) + normalization payload              | Route normalized value, log        |
+| G address + non-numeric MEMO_TEXT                                 | none          | MEMO_TEXT_UNROUTABLE (warn)                                          | Manual review                      |
+| G address + MEMO_HASH or MEMO_RETURN                              | none          | UNSUPPORTED_MEMO_TYPE (warn)                                         | Manual review                      |
+| G address + no memo                                               | none          | ,                                                                    | Manual review                      |
+| Unknown memoType string                                           | none          | UNSUPPORTED_MEMO_TYPE (warn) with `context: { memoType: 'unknown' }` | Manual review                      |
+| Contract sender + no routing ID                                   | none          | CONTRACT_SENDER_DETECTED + INVALID_DESTINATION (error)               | Alert immediately                  |
+| C address as destination                                          | none          | INVALID_DESTINATION (error)                                          | Alert immediately, always          |
+| Unparseable destination                                           | none          | ,                                                                    | destinationError.code explains why |
 
 ## Warning System
 
@@ -169,12 +149,12 @@ type Warning =
 ```
 
 **Severity meanings:**
+
 - `info`, informational, no action needed
 - `warn`, log and investigate
 - `error`, reject the deposit and alert ops immediately
 
 `destinationError` invariant: when `destinationError` is present, `destinationBaseAccount` is null, `routingId` is null, `routingSource` is `'none'`, and `warnings` is empty. No partial population. Check `destinationError` as a single gate before inspecting any other field.
-
 
 ## Common Integration Mistakes
 
@@ -196,7 +176,6 @@ Muxed IDs are uint64. `Number` silently loses precision above 2^53. The library 
 **Passing non-standard memoType strings**
 `memoType` is `string` at the spec boundary. Anything not in `['none', 'id', 'text', 'hash', 'return']`, including `'MemoID'`, `'ID'`, `'memo_id'`, or an empty string, emits `UNSUPPORTED_MEMO_TYPE` with `routingSource: 'none'`. It never throws. Map your transaction's memo type to a known value before calling `extractRouting` if you want deterministic routing.
 
-
 ## The Spec
 
 Every behavior in this library is encoded in `spec/vectors.json` and validated against `spec/schema.json`. The schema enforces the discriminated union structure of warnings using JSON Schema `oneOf` with `additionalProperties: false` per variant, contributors cannot add undocumented fields, attach normalization to a warning code that doesn't carry it, or use the wrong severity value for a given code.
@@ -213,7 +192,6 @@ The spec artifact will be published independently once released, so teams can pi
 import vectors from "./spec/vectors.json";
 import schema from "./spec/schema.json";
 ```
-
 
 ## Contributing
 
@@ -250,38 +228,35 @@ cd packages/core-go && go test -fuzz=. -fuzztime=300s ./spec/...
 node scripts/check-vectors-sync.js
 ```
 
-
 ## Spec Compliance
 
 The following vectors are the non-negotiable baseline for any compliant implementation:
 
-| Vector | Why It Matters |
-|--------|---------------|
-| `id: "9007199254740993"`, 2^53+1 canary | Catches any Number coercion, runs on every commit for all three languages |
-| `id: "18446744073709551615"`, uint64 max | Confirms full range is handled |
-| `id: "18446744073709551616"`, uint64 overflow | Confirms overflow is rejected, not wrapped |
-| Lowercase address input | Confirms output address field is always uppercase |
-| `"NOTANADDRESS"` → UNKNOWN_PREFIX | Confirms prefix detection fires before checksum check |
-| Tampered G-length string → INVALID_CHECKSUM | Deterministic checksum failure independent of parser path |
-| C address as destination → INVALID_DESTINATION error | Confirms valid StrKey ≠ valid payment destination |
-| `destinationError` present → all other fields null/none/empty | Confirms invariant is unconditional |
-
+| Vector                                                        | Why It Matters                                                            |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `id: "9007199254740993"`, 2^53+1 canary                       | Catches any Number coercion, runs on every commit for all three languages |
+| `id: "18446744073709551615"`, uint64 max                      | Confirms full range is handled                                            |
+| `id: "18446744073709551616"`, uint64 overflow                 | Confirms overflow is rejected, not wrapped                                |
+| Lowercase address input                                       | Confirms output address field is always uppercase                         |
+| `"NOTANADDRESS"` → UNKNOWN_PREFIX                             | Confirms prefix detection fires before checksum check                     |
+| Tampered G-length string → INVALID_CHECKSUM                   | Deterministic checksum failure independent of parser path                 |
+| C address as destination → INVALID_DESTINATION error          | Confirms valid StrKey ≠ valid payment destination                         |
+| `destinationError` present → all other fields null/none/empty | Confirms invariant is unconditional                                       |
 
 ## Glossary
 
-| Term | Definition |
-|------|-----------|
-| G address | Classic Stellar account. 56-character StrKey starting with G. |
-| M address | Muxed account. A G address + 64-bit integer ID embedded into a single string starting with M. Replaces memo for deposit routing when memo is unavailable. |
-| C address | Soroban contract address starting with C. Valid StrKey, but treated as INVALID_DESTINATION by this library for classic payment routing. |
-| muxed ID | The 64-bit integer embedded in an M address. The routing identifier when `routingSource` is `'muxed'`. |
-| routingSource | How `extractRouting` found the routing identifier: `'muxed'` (M address), `'memo'` (MEMO_ID or numeric MEMO_TEXT), `'none'` (no routable identifier). |
-| MEMO_ID | Numeric Stellar memo type. Canonical routing identifier for classic deposit flows. |
-| MEMO_TEXT | Text Stellar memo type. Routable only if strictly a non-negative integer within uint64 range. Leading zeros are accepted and normalized with a warning. |
-| MEMO_HASH / MEMO_RETURN | Non-routing memo types. Always `routingSource: 'none'`. |
-| ErrorCode | Returned when input cannot be parsed. In `destinationError`. Never in `warnings[]`. |
-| WarningCode | Returned when input parsed successfully but requires attention. In `warnings[]`. Never in `destinationError`. |
-
+| Term                    | Definition                                                                                                                                                |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| G address               | Classic Stellar account. 56-character StrKey starting with G.                                                                                             |
+| M address               | Muxed account. A G address + 64-bit integer ID embedded into a single string starting with M. Replaces memo for deposit routing when memo is unavailable. |
+| C address               | Soroban contract address starting with C. Valid StrKey, but treated as INVALID_DESTINATION by this library for classic payment routing.                   |
+| muxed ID                | The 64-bit integer embedded in an M address. The routing identifier when `routingSource` is `'muxed'`.                                                    |
+| routingSource           | How `extractRouting` found the routing identifier: `'muxed'` (M address), `'memo'` (MEMO_ID or numeric MEMO_TEXT), `'none'` (no routable identifier).     |
+| MEMO_ID                 | Numeric Stellar memo type. Canonical routing identifier for classic deposit flows.                                                                        |
+| MEMO_TEXT               | Text Stellar memo type. Routable only if strictly a non-negative integer within uint64 range. Leading zeros are accepted and normalized with a warning.   |
+| MEMO_HASH / MEMO_RETURN | Non-routing memo types. Always `routingSource: 'none'`.                                                                                                   |
+| ErrorCode               | Returned when input cannot be parsed. In `destinationError`. Never in `warnings[]`.                                                                       |
+| WarningCode             | Returned when input parsed successfully but requires attention. In `warnings[]`. Never in `destinationError`.                                             |
 
 ## Design Principles
 
@@ -293,7 +268,6 @@ The following vectors are the non-negotiable baseline for any compliant implemen
 
 **The spec is the product.** `vectors.json` defines what the library does. Implementations exist to pass it. New behaviors are added to `vectors.json` first, then implemented, never the reverse.
 
-
 ## SDK Relationship
 
 This library wraps, not replaces the Stellar SDK.
@@ -304,25 +278,21 @@ This library wraps, not replaces the Stellar SDK.
 
 When the SDK improves its primitives, this library gets better for free. The SDK will never ship `extractRouting`. That is the boundary.
 
-
 ## Status
 
-| Component | Status |
-|-----------|--------|
-| spec/vectors.json | v1.0.1 Stable |
-| stellar-address-kit (TypeScript) | [v1.0.1 Released](https://www.npmjs.com/package/stellar-address-kit) |
-| core-go (Go) | [v1.0.1 Released](https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go) |
-| stellar_address_kit (Dart) | [v1.0.1 Released](https://pub.dev/packages/stellar_address_kit) |
-| @stellar-address-kit/spec | v1.0.1 Stable |
+| Component                        | Status                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------- |
+| spec/vectors.json                | v1.0.1 Stable                                                                                     |
+| stellar-address-kit (TypeScript) | [v1.0.1 Released](https://www.npmjs.com/package/stellar-address-kit)                              |
+| core-go (Go)                     | [v1.0.1 Released](https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go) |
+| stellar_address_kit (Dart)       | [v1.0.1 Released](https://pub.dev/packages/stellar_address_kit)                                   |
+| @stellar-address-kit/spec        | v1.0.1 Stable                                                                                     |
 
 > This project is now live! All three language implementations are released and ready for production integration. Contributions and feedback are welcome.
-
-
 
 ## License
 
 MIT, see [LICENSE](./LICENSE)
-
 
 ## Acknowledgements
 
