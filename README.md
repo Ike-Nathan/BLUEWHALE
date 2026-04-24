@@ -1,7 +1,7 @@
 <h1 align="center">Stellar Address Kit</h1>
 
 <p align="center">
-  <b>The single source of truth for secure deposit routing and address interoperability on Stellar.</b>
+  <b>The deposit routing spec for Stellar, implemented in TypeScript, Go, and Dart.</b>
 </p>
 
 <p align="center">
