@@ -1,4 +1,4 @@
-# stellar_address_kit (Dart)
+# stellar-address-kit (Dart)
 
 The Dart/Flutter implementation of the Stellar Address Kit. 
 
@@ -17,7 +17,7 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  stellar_address_kit: ^1.0.0
+  stellar_address_kit: ^1.0.1
 ```
 
 ## Quick Start
@@ -28,16 +28,27 @@ import 'package:stellar_address_kit/stellar_address_kit.dart';
 void main() {
   final address = 'GA7QYNF7SOWQ3GLR2B6RS22TBGZAOR6KLYH4PA5ZAM73A3H4K2HZZSQU';
   
-  if (AddressValidator.isValid(address)) {
-    final kind = AddressDetector.detect(address);
+  if (validate(address)) {
+    final kind = detect(address);
     print('Address kind: $kind');
+    
+    final parsed = StellarAddress.parse(address);
+    print('Base G address: ${parsed.baseG}');
   }
 }
 ```
 
+## Examples
+
+### Simple Dart Example
+A basic example can be found in the [example/](example/) folder.
+
+### Full Flutter Demo
+For a complete integration in a Flutter application, including UI components for displaying deposit addresses and handling incoming payments, check out the [flutter-demo](../../examples/flutter-demo) in the root repository.
+
 ## Documentation
 
-For deep dives into Flutter implementation and web BigInt considerations, see the [Guides](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/docs/guides).
+For deep dives into Flutter implementation and web BigInt considerations, see our [comprehensive Guides](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/docs/guides).
 
 ## License
 

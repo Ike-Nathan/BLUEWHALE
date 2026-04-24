@@ -41,7 +41,7 @@ if (!result.destinationError) {
 
 ## Documentation
 
-For full guides and integration examples, see the [main documentation](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/docs/guides).
+For full guides, integration examples, and deep dives into the routing logic, see our [comprehensive Guides](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/docs/guides).
 
 ## License
 

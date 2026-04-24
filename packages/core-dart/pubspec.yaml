@@ -1,7 +1,7 @@
 name: stellar_address_kit
-description: Dart implementation of the Stellar Address Kit.
-version: 1.0.0
-repository: https://github.com/stellar-address-kit/core-dart
+description: A robust Dart implementation of the Stellar Address Kit, providing safe handling of G, M, and C addresses with cross-language specification compliance.
+version: 1.0.1
+repository: https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/packages/core-dart
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

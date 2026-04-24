@@ -1,6 +1,6 @@
 {
   "name": "stellar-address-kit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript implementation of the Stellar Address Kit",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

@@ -1,4 +1,4 @@
-# core-go (Go)
+# stellar-address-kit (Go)
 
 The Go implementation of the Stellar Address Kit. 
 
@@ -45,6 +45,11 @@ func main() {
 	fmt.Printf("Routing ID: %s\n", result.RoutingID)
 }
 ```
+
+## Examples
+
+### Complete Payment Listener
+For a production-ready example of a background worker that listens for payments on the Stellar network and routes them using this kit, see the [go-payment-listener](../../examples/go-payment-listener) in the root repository.
 
 ## Documentation
 

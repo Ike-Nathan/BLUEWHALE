@@ -284,11 +284,11 @@ When the SDK improves its primitives, this library gets better for free. The SDK
 
 | Component | Status |
 |-----------|--------|
-| spec/vectors.json | v1.0.0 Stable |
-| stellar-address-kit (TypeScript) | [v1.0.0 Released](https://www.npmjs.com/package/stellar-address-kit) |
-| core-go (Go) | [v1.0.0 Released](https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go) |
-| stellar_address_kit (Dart) | [v1.0.0 Released](https://pub.dev/packages/stellar_address_kit) |
-| @stellar-address-kit/spec | v1.0.0 Stable |
+| spec/vectors.json | v1.0.1 Stable |
+| stellar-address-kit (TypeScript) | [v1.0.1 Released](https://www.npmjs.com/package/stellar-address-kit) |
+| core-go (Go) | [v1.0.1 Released](https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go) |
+| stellar_address_kit (Dart) | [v1.0.1 Released](https://pub.dev/packages/stellar_address_kit) |
+| @stellar-address-kit/spec | v1.0.1 Stable |
 
 > This project is now live! All three language implementations are released and ready for production integration. Contributions and feedback are welcome.
 
