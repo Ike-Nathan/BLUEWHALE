@@ -1,5 +1,6 @@
 {
   "spec_version": "1.0.0",
+  "description": "Normative test vectors for the Stellar Address Kit. This file is the single source of truth for routing logic across TypeScript, Go, and Dart implementations. Any change to routing behavior MUST start here.",
   "cases": [
     {
       "module": "muxed_encode",

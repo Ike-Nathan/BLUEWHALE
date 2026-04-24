@@ -1,24 +1,22 @@
 # stellar-address-kit (Dart)
 
-The Dart/Flutter implementation of the Stellar Address Kit. 
-
-This package provides a robust way to handle Stellar addresses (G, M, and C) and extract routing identifiers from incoming payments in mobile and web applications.
-
-## Features
-
-- **Address Detection**: Correct identifying G, M, and C addresses.
-- **Muxed Support**: Safe encoding and decoding of M-addresses.
-- **Routing Logic**: Reconcile incoming payments using Muxed IDs or Memos.
-- **Validator Compliance**: Verified against a cross-language test suite (`vectors.json`).
-
-## Installation
-
-Add this to your `pubspec.yaml`:
+The Dart/Flutter implementation of the Stellar Address Kit for mobile and web wallet routing.
 
 ```yaml
 dependencies:
   stellar_address_kit: ^1.0.1
 ```
+
+Part of a multi-language suite also available in **[TypeScript](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/packages/core-ts)** and **[Go](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/packages/core-go)**.
+
+---
+
+### 📖 Documentation & Guides
+- [Flutter: Displaying Deposit Addresses](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/flutter-displaying-deposit-addresses.md)
+- [Flutter: Web BigInt Considerations](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/flutter-web-bigint.md)
+- [General: Compatibility Reference](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/compatibility-reference.md)
+
+---
 
 ## Quick Start
 

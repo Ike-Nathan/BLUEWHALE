@@ -1,21 +1,21 @@
 # stellar-address-kit (Go)
 
-The Go implementation of the Stellar Address Kit. 
-
-This package provides high-performance deposit routing and address interop for Go-based Stellar services. It is designed to be lightweight, building directly on `github.com/stellar/go/strkey` with zero additional dependencies.
-
-## Features
-
-- **Efficient Routing**: Extract routing IDs from Stellar transactions and muxed addresses.
-- **Spec Compliant**: Verified against the shared `vectors.json` test suite.
-- **Zero Dependencies**: Doesn't bloat your project; only depends on the official Stellar Go SDK.
-- **High Performance**: Optimized for backend workers streaming thousands of transactions per minute.
-
-## Installation
+The Go implementation of the Stellar Address Kit for high-performance deposit routing and address interop.
 
 ```bash
 go get github.com/Boxkit-Labs/stellar-address-kit/packages/core-go
 ```
+
+Part of a multi-language suite also available in **[TypeScript](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/packages/core-ts)** and **[Dart](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/packages/core-dart)**.
+
+---
+
+### 📖 Documentation & Guides
+- [Go: Deposit Routing Service Integration](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/go-deposit-routing-service.md)
+- [Go: Running the Spec Validator](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/go-running-spec-validator.md)
+- [General: Compatibility Reference](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/compatibility-reference.md)
+
+---
 
 ## Quick Start
 

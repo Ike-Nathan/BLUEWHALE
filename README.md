@@ -1,17 +1,21 @@
 <h1 align="center">Stellar Address Kit</h1>
 
 <p align="center">
+  <b>The single source of truth for secure deposit routing and address interoperability on Stellar.</b>
+</p>
+
+<p align="center">
   <a href="https://pub.dev/packages/stellar_address_kit"><img src="https://img.shields.io/pub/v/stellar_address_kit.svg" alt="Pub.dev"></a>
   <a href="https://www.npmjs.com/package/stellar-address-kit"><img src="https://img.shields.io/npm/v/stellar-address-kit.svg" alt="NPM"></a>
   <a href="https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go"><img src="https://img.shields.io/badge/go-reference-blue?logo=go" alt="Go Reference"></a>
   <a href="https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
 </p>
 
-<p align="center">
-  <b>The deposit routing & address interop spec for Stellar (G/M/C + memos).</b><br/>
-  Validated identically across <b>TypeScript</b>, <b>Go</b>, and <b>Dart</b>.
-</p>
+This project implements a unified routing policy across TypeScript, Go, and Dart, ensuring that exchanges, wallets, and payment platforms handle G-addresses, M-addresses, and memos identically. 
 
+**[View the Normative Spec (vectors.json)](./spec/vectors.json)** | **[Read the Integration Guides](./docs/guides)**
+
+---
 ## Project Structure
 
 ```

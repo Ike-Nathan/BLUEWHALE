@@ -1,25 +1,21 @@
 # stellar-address-kit (TypeScript)
 
-The TypeScript reference implementation of the Stellar Address Kit. 
-
-This package provides a high-level API for deposit routing on the Stellar network, correctly handling G-addresses, M-addresses, and memos (ID and Text) according to a shared specification.
-
-## Features
-
-- **Routing Extraction**: Parse an incoming transaction destination and memo to find the intended user routing ID.
-- **Muxed Address Support**: Encode and decode M-addresses (SEP-0023).
-- **Safe BigInt Handling**: Properly handles 64-bit integer IDs without precision loss.
-- **Normalization**: Handles non-canonical addresses and IDs with helpful warnings.
-
-## Installation
+The TypeScript reference implementation of the Stellar Address Kit for secure deposit routing and address interop.
 
 ```bash
 npm install stellar-address-kit
-# or
-pnpm add stellar-address-kit
-# or
-yarn add stellar-address-kit
 ```
+
+Part of a multi-language suite also available in **[Go](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/packages/core-go)** and **[Dart](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/packages/core-dart)**.
+
+---
+
+### 📖 Documentation & Guides
+- [TypeScript: Reconciling Deposits with Missing Memos](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/reconciling-deposits-missing-memo.md)
+- [TypeScript: Pooled Accounts & Muxed Deposits](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/pooled-accounts-muxed-deposits.md)
+- [General: Compatibility Reference](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/compatibility-reference.md)
+
+---
 
 ## Quick Start
 
