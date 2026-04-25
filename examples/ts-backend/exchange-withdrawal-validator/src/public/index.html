@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exchange Withdrawal Validator</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 20px; cursor: pointer; }
+        #result { margin-top: 20px; padding: 15px; border: 1px solid #ddd; display: none; }
+    </style>
+</head>
+<body>
+    <h1>Exchange Withdrawal Validator</h1>
+    
+    <div class="form-group">
+        <label for="address">Stellar Address (G..., M..., or C...)</label>
+        <input type="text" id="address" placeholder="Enter Stellar address">
+    </div>
+
+    <div class="form-group">
+        <label for="memoType">Memo Type</label>
+        <select id="memoType">
+            <option value="none">None</option>
+            <option value="text">TEXT</option>
+            <option value="id">ID</option>
+            <option value="hash">HASH</option>
+            <option value="return">RETURN</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="memoValue">Memo Value</label>
+        <input type="text" id="memoValue" placeholder="Enter memo value">
+    </div>
+
+    <button id="submit">Validate Withdrawal</button>
+
+    <div id="result"></div>
+
+    <script>
+        const submitBtn = document.getElementById('submit');
+        const addressInput = document.getElementById('address');
+        const memoTypeSelect = document.getElementById('memoType');
+        const memoValueInput = document.getElementById('memoValue');
+        const resultDiv = document.getElementById('result');
+
+        submitBtn.addEventListener('click', async () => {
+            const data = {
+                address: addressInput.value,
+                memoType: memoTypeSelect.value,
+                memoValue: memoValueInput.value
+            };
+
+            // Logic will be implemented later
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Submission received (placeholder)';
+        });
+
+        addressInput.addEventListener('input', () => {
+            // Logic for disabling memo for M-addresses will be implemented later
+        });
+    </script>
+</body>
+</html>
