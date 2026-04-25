@@ -3,7 +3,7 @@ module github.com/Boxkit-Labs/stellar-address-kit/examples/go-payment-listener
 go 1.22
 
 require (
-	github.com/Boxkit-Labs/stellar-address-kit/packages/core-go v1.0.0
+	github.com/Boxkit-Labs/stellar-address-kit/packages/core-go v1.0.1
 	github.com/prometheus/client_golang v1.17.0
 	github.com/rs/zerolog v1.31.0
 	github.com/spf13/viper v1.17.0

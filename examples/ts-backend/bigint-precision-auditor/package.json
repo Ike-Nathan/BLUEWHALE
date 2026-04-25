@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "stellar-address-kit": "workspace:*",
+    "stellar-address-kit": "^1.0.1",
     "@stellar/stellar-sdk": "^12.3.0"
   },
   "devDependencies": {
