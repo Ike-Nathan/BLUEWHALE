@@ -1,0 +1,28 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "meta",
+      "rootUri": "file:///C:/Users/TCE%20HUB/AppData/Local/Pub/Cache/hosted/pub.dev/meta-1.18.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "stellar_address_kit",
+      "rootUri": "../../../../packages/core-dart",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "conformance_test_runner",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    }
+  ],
+  "generator": "pub",
+  "generatorVersion": "3.9.2",
+  "flutterRoot": "file:///C:/Users/TCE%20HUB/fvm/default",
+  "flutterVersion": "3.35.7",
+  "pubCache": "file:///C:/Users/TCE%20HUB/AppData/Local/Pub/Cache"
+}

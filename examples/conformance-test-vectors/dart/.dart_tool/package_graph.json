@@ -1,0 +1,28 @@
+{
+  "roots": [
+    "conformance_test_runner"
+  ],
+  "packages": [
+    {
+      "name": "conformance_test_runner",
+      "version": "0.0.0",
+      "dependencies": [
+        "stellar_address_kit"
+      ],
+      "devDependencies": []
+    },
+    {
+      "name": "stellar_address_kit",
+      "version": "1.0.1",
+      "dependencies": [
+        "meta"
+      ]
+    },
+    {
+      "name": "meta",
+      "version": "1.18.3",
+      "dependencies": []
+    }
+  ],
+  "configVersion": 1
+}
