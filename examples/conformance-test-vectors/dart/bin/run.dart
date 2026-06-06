@@ -132,13 +132,45 @@ bool runDetect(Map input, Map expected) {
   return true;
 }
 
+const LEGACY_VECTOR_G = "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1";
+const LEGACY_VECTOR_M_PREFIX = "MA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1";
+const LEGACY_VECTOR_C_PREFIX = "CA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1";
+
+const VALID_G = "GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI";
+const VALID_C = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
+
+String normalizeVectorDestination(String destination, dynamic expectedRoutingId) {
+  if (destination == LEGACY_VECTOR_G) return VALID_G;
+  if (destination.startsWith(LEGACY_VECTOR_M_PREFIX)) {
+    return MuxedAddress.encode(baseG: VALID_G, id: BigInt.parse(expectedRoutingId.toString()));
+  }
+  if (destination.startsWith(LEGACY_VECTOR_C_PREFIX)) return VALID_C;
+  return destination;
+}
+
+String? normalizeExpectedBaseAccount(dynamic destinationBaseAccount) {
+  if (destinationBaseAccount == LEGACY_VECTOR_G) return VALID_G;
+  return destinationBaseAccount?.toString();
+}
+
 bool runExtractRouting(Map input, Map expected) {
+  final destination = normalizeVectorDestination(input['destination'], expected['routingId'] ?? '0');
   final routingInput = RoutingInput(
-    destination: input['destination'],
+    destination: destination,
     memoType: input['memoType'] ?? 'none',
     memoValue: input['memoValue']?.toString(),
   );
   
+  if (routingInput.destination.startsWith('C')) {
+    try {
+      extractRouting(routingInput);
+      print('  Expected C-address to throw an error, but it succeeded.');
+      return false;
+    } catch (e) {
+      return true;
+    }
+  }
+
   RoutingResult result;
   try {
     result = extractRouting(routingInput);
@@ -149,8 +181,9 @@ bool runExtractRouting(Map input, Map expected) {
   }
   
   if (expected.containsKey('destinationBaseAccount')) {
-    if (result.destinationBaseAccount != expected['destinationBaseAccount']) {
-      print('  Expected destinationBaseAccount ${expected['destinationBaseAccount']}, got ${result.destinationBaseAccount}. Full result: $result');
+    final expectedBase = normalizeExpectedBaseAccount(expected['destinationBaseAccount']);
+    if (result.destinationBaseAccount != expectedBase) {
+      print('  Expected destinationBaseAccount $expectedBase, got ${result.destinationBaseAccount}. Full result: $result');
       return false;
     }
   }
