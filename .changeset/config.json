@@ -4,7 +4,7 @@
   "commit": false,
   "fixed": [],
   "linked": [
-    ["@stellar-address-kit/spec", "stellar-address-kit", "core-go", "core-dart"]
+    ["@redishfish/bluewhale-spec", "@redishfish/bluewhale-core", "core-go", "core-dart"]
   ],
   "access": "public",
   "baseBranch": "main",

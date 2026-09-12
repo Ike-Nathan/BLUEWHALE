@@ -1,8 +1,8 @@
-# Stellar Address Kit Specification
+# Bluewhale Specification
 
 **The normative source of truth for cross-language Stellar address routing and interop.**
 
-This directory contains the formal definition of the Stellar Address Kit's behavior. It ensures that any compliant implementation (TypeScript, Go, Dart, etc.) produces bit-identical results for the same input, regardless of platform or language-specific quirks.
+This directory contains the formal definition of the Bluewhale's behavior. It ensures that any compliant implementation (TypeScript, Go, Dart, etc.) produces bit-identical results for the same input, regardless of platform or language-specific quirks.
 
 ---
 
@@ -59,7 +59,7 @@ pnpm spec:validate
 
 ## 🤝 Contribution Workflow
 
-The Stellar Address Kit follows a **Spec-First** model:
+The Bluewhale follows a **Spec-First** model:
 
 1. **Vector Addition**: New behaviors or bug fixes must start by adding a case to [`vectors.json`](./vectors.json).
 2. **Structural Validation**: Ensure the new vector passes the schema defined in `schema.json`.

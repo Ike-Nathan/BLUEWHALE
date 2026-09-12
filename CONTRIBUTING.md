@@ -1,6 +1,6 @@
-# Contributing to Stellar Address Kit
+# Contributing to Bluewhale
 
-First off, thank you for considering contributing to the Stellar Address Kit! It's people like you that make the Stellar ecosystem a better place for developers.
+First off, thank you for considering contributing to the Bluewhale! It's people like you that make the Stellar ecosystem a better place for developers.
 
 ### How Can I Contribute?
 
@@ -11,7 +11,7 @@ The most impactful way to contribute is by adding new test vectors to `spec/vect
 3. Update the TypeScript, Go, and Dart implementations to pass the new vector.
 
 #### Reporting Bugs
-*   Check the [Issues](https://github.com/Boxkit-Labs/stellar-address-kit/issues) to see if the bug has already been reported.
+*   Check the [Issues](https://github.com/REDISHFISH/BLUEWHALE/issues) to see if the bug has already been reported.
 *   If not, open a new issue with a clear title and description, including steps to reproduce the bug.
 
 #### Suggesting Enhancements

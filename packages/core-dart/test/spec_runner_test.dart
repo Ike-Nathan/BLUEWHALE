@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:test/test.dart';
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 
 const legacyVectorG = "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1";
 const legacyVectorMPrefix = "MA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1";

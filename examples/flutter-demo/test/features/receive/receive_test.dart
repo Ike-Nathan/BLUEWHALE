@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:stellar_address_kit_demo/features/receive/domain/usecases/generate_deposit_instruction.dart';
-import 'package:stellar_address_kit_demo/features/receive/presentation/bloc/receive_bloc.dart';
+import 'package:bluewhale_demo/features/receive/domain/usecases/generate_deposit_instruction.dart';
+import 'package:bluewhale_demo/features/receive/presentation/bloc/receive_bloc.dart';
 
 void main() {
   const testAddress = 'GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI';

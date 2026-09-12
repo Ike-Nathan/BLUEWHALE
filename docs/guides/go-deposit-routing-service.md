@@ -2,7 +2,7 @@
 
 For backend applications, a common architecture involves running a "deposit routing service" or "worker". This service continuously streams transactions from the Stellar network (via Horizon) for a given pooled account, and routes incoming funds to internal user balances in a database based on the Muxed ID or Memo ID.
 
-This guide demonstrates how to build a robust routing service using the Go implementation of `stellar-address-kit`.
+This guide demonstrates how to build a robust routing service using the Go implementation of `@redishfish/bluewhale-core`.
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ import (
     "log"
     "github.com/stellar/go/clients/horizonclient"
     "github.com/stellar/go/protocols/horizon/operations"
-    addresskit "github.com/Boxkit-Labs/stellar-address-kit/core-go"
+    addresskit "github.com/REDISHFISH/BLUEWHALE/core-go"
 )
 ```
 
@@ -31,7 +31,7 @@ import (
 
     "github.com/stellar/go/clients/horizonclient"
     "github.com/stellar/go/protocols/horizon/operations"
-    addresskit "github.com/Boxkit-Labs/stellar-address-kit/core-go"
+    addresskit "github.com/REDISHFISH/BLUEWHALE/core-go"
 )
 
 func main() {
@@ -56,7 +56,7 @@ func main() {
 
 ## Processing and Reconciling Payments
 
-The `processPayment` callback is where the `stellar-address-kit` shines. We need to extract the routing ID safely and correctly, checking both the Muxed destination and the transaction Memo.
+The `processPayment` callback is where the `@redishfish/bluewhale-core` shines. We need to extract the routing ID safely and correctly, checking both the Muxed destination and the transaction Memo.
 
 ```go
 func processPayment(op operations.Operation) {

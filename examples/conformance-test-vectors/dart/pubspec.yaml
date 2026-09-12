@@ -1,9 +1,9 @@
 name: conformance_test_runner
-description: Dart conformance test runner for Stellar Address Kit
+description: Dart conformance test runner for Bluewhale
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
-  stellar_address_kit:
+  bluewhale_core:
     path: ../../../packages/core-dart

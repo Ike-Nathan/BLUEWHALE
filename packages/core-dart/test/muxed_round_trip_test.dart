@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:test/test.dart';
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 
 // Fixed valid G address used as the base for round-trip tests.
 const _baseG = 'GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI';

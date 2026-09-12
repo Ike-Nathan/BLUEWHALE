@@ -1,4 +1,4 @@
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 
 void main() async {
   // 1. Detect and Validate address types

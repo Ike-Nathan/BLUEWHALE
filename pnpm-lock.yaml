@@ -34,7 +34,7 @@ importers:
         specifier: ^15.0.0
         version: 15.0.0
     devDependencies:
-      '@stellar-address-kit/spec':
+      '@redishfish/bluewhale-spec':
         specifier: workspace:*
         version: link:../spec
       '@stellar/stellar-sdk':

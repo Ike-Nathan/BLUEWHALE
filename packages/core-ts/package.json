@@ -1,7 +1,7 @@
 {
-  "name": "stellar-address-kit",
+  "name": "@redishfish/bluewhale-core",
   "version": "1.0.1",
-  "description": "TypeScript implementation of the Stellar Address Kit",
+  "description": "TypeScript implementation of the Bluewhale",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -21,7 +21,7 @@
     "@stellar/stellar-sdk": ">=10.0.0"
   },
   "devDependencies": {
-    "@stellar-address-kit/spec": "workspace:*",
+    "@redishfish/bluewhale-spec": "workspace:*",
     "@stellar/stellar-sdk": "^12.3.0",
     "eslint": "^8.56.0",
     "tsup": "^8.0.1",

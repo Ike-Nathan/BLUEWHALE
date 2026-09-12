@@ -1,6 +1,6 @@
 ---
 title: "Go: Deposit Routing Service"
-description: "Integrating Stellar Address Kit into your Go backend."
+description: "Integrating Bluewhale into your Go backend."
 ---
 
 When building a deposit service in Go, you need to reconcile incoming payments with your internal user accounts.
@@ -12,7 +12,7 @@ package main
 
 import (
     "fmt"
-    "github.com/Boxkit-Labs/stellar-address-kit/packages/core-go/addresskit"
+    "github.com/REDISHFISH/BLUEWHALE/packages/core-go/addresskit"
 )
 
 func handleIncomingPayment(dest string, memoType string, memoValue string) {

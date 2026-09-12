@@ -1,19 +1,19 @@
-# stellar-address-kit (Go)
+# @redishfish/bluewhale-core (Go)
 
-The Go implementation of the Stellar Address Kit for high-performance deposit routing and address interop.
+The Go implementation of the Bluewhale for high-performance deposit routing and address interop.
 
 ```bash
-go get github.com/Boxkit-Labs/stellar-address-kit/packages/core-go
+go get github.com/REDISHFISH/BLUEWHALE/packages/core-go
 ```
 
-Part of a multi-language suite also available in **[TypeScript](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/packages/core-ts)** and **[Dart](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/packages/core-dart)**.
+Part of a multi-language suite also available in **[TypeScript](https://github.com/REDISHFISH/BLUEWHALE/tree/main/packages/core-ts)** and **[Dart](https://github.com/REDISHFISH/BLUEWHALE/tree/main/packages/core-dart)**.
 
 ---
 
 ### 📖 Documentation & Guides
-- [Go: Deposit Routing Service Integration](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/go-deposit-routing-service.md)
-- [Go: Running the Spec Validator](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/go-running-spec-validator.md)
-- [General: Compatibility Reference](https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/docs/guides/compatibility-reference.md)
+- [Go: Deposit Routing Service Integration](https://github.com/REDISHFISH/BLUEWHALE/blob/main/docs/guides/go-deposit-routing-service.md)
+- [Go: Running the Spec Validator](https://github.com/REDISHFISH/BLUEWHALE/blob/main/docs/guides/go-running-spec-validator.md)
+- [General: Compatibility Reference](https://github.com/REDISHFISH/BLUEWHALE/blob/main/docs/guides/compatibility-reference.md)
 
 ---
 
@@ -24,8 +24,8 @@ package main
 
 import (
 	"fmt"
-	addresskit "github.com/Boxkit-Labs/stellar-address-kit/packages/core-go/address"
-	"github.com/Boxkit-Labs/stellar-address-kit/packages/core-go/routing"
+	addresskit "github.com/REDISHFISH/BLUEWHALE/packages/core-go/address"
+	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/routing"
 )
 
 func main() {
@@ -53,7 +53,7 @@ For a production-ready example of a background worker that listens for payments 
 
 ## Documentation
 
-For integration guides and detailed Go examples, see the [Go Guides](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/docs/guides).
+For integration guides and detailed Go examples, see the [Go Guides](https://github.com/REDISHFISH/BLUEWHALE/tree/main/docs/guides).
 
 ## License
 

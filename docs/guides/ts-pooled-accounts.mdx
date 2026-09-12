@@ -9,10 +9,10 @@ Pooled accounts are a common pattern for exchanges and fintech apps. This guide 
 JavaScript's `Number` type is a 64-bit float, which cannot safely represent all 64-bit integers (specifically those above 2^53 - 1).
 
 ## The Solution
-Stellar Address Kit always returns the `routingId` as a **string** to avoid any precision loss.
+Bluewhale always returns the `routingId` as a **string** to avoid any precision loss.
 
 ```typescript
-import { extractRouting } from 'stellar-address-kit';
+import { extractRouting } from '@redishfish/bluewhale-core';
 
 const result = extractRouting({
   address: "MA7Q...QD"

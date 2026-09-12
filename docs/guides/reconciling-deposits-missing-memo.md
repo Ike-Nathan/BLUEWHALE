@@ -1,6 +1,6 @@
 # Reconciling Deposits with Missing Memos
 
-When a deposit arrives with no memo (or an unroutable memo), the `stellar-address-kit` provides operational signals via `WarningCode`.
+When a deposit arrives with no memo (or an unroutable memo), the `@redishfish/bluewhale-core` provides operational signals via `WarningCode`.
 
 ## The Contract Sender Scenario
 

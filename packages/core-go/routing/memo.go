@@ -3,7 +3,7 @@ package routing
 import (
 	"strings"
 
-	"github.com/Boxkit-Labs/stellar-address-kit/packages/core-go/address"
+	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/address"
 )
 
 // uint64MaxStr is the decimal string representation of math.MaxUint64.

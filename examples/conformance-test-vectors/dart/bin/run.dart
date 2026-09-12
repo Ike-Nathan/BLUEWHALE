@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 
 void main() {
   final file = File('../../../spec/vectors.json');

@@ -10,7 +10,7 @@ library;
 
 import 'dart:convert';
 
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 import 'package:test/test.dart';
 
 void main() {

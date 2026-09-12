@@ -3,7 +3,7 @@ name = "prism-core"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.87.0"
-description = "Rust implementation of the stellar-address-kit Stellar address parser"
+description = "Rust implementation of the @redishfish/bluewhale-core Stellar address parser"
 license = "MIT"
 
 [lib]

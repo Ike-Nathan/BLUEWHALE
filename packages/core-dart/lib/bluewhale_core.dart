@@ -1,4 +1,4 @@
-library stellar_address_kit;
+library bluewhale_core;
 
 export 'src/address/stellar_address.dart';
 export 'src/address/detect.dart';

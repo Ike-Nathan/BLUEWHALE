@@ -25,9 +25,9 @@ jobs:
 
       - run: pnpm install
       
-      - run: pnpm --filter stellar-address-kit build
+      - run: pnpm --filter @redishfish/bluewhale-core build
 
       - name: Publish to NPM
-        run: pnpm --filter stellar-address-kit publish --no-git-checks --access public --provenance
+        run: pnpm --filter @redishfish/bluewhale-core publish --no-git-checks --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

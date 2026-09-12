@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Boxkit-Labs/stellar-address-kit/packages/core-go/address"
-	"github.com/Boxkit-Labs/stellar-address-kit/packages/core-go/muxed"
+	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/address"
+	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/muxed"
 )
 
 // normalizeUnsupportedMemoType canonicalizes a memo type string by lower-casing it

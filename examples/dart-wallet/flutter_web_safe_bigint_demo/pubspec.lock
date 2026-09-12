@@ -192,10 +192,10 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.12.1"
-  stellar_address_kit:
+  bluewhale_core:
     dependency: "direct main"
     description:
-      name: stellar_address_kit
+      name: bluewhale_core
       sha256: "8184e5e623c4895583c7233c463c3dd7787e0de8feae0d245723035cfa076abc"
       url: "https://pub.dev"
     source: hosted

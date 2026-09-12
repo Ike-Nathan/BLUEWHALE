@@ -1,5 +1,5 @@
 /** 
- * Shared domain types for stellar-address-kit routing extraction.
+ * Shared domain types for @redishfish/bluewhale-core routing extraction.
  */
 
 // ─── Warning codes ────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 package listener
 
 import (
-	"github.com/Boxkit-Labs/stellar-address-kit/packages/core-go/routing"
+	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/routing"
 )
 
 type Severity string

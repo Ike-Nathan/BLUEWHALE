@@ -4,7 +4,7 @@ This guide outlines the strategy for moving your exchange or wallet from a memo-
 
 ## Strategy 1: The "Accept Both" Phase (Recommended)
 
-During the migration period, your system should accept both routing methods. The `stellar-address-kit` makes this trivial by abstracting the source.
+During the migration period, your system should accept both routing methods. The `@redishfish/bluewhale-core` makes this trivial by abstracting the source.
 
 ```typescript
 const result = extractRouting(input);
@@ -20,6 +20,6 @@ Muxed IDs are 64-bit unsigned integers. Ensure your database column can store th
 ## Cutover Steps
 
 1. **Update SDK**: Ensure your Stellar SDK supports M-addresses.
-2. **Library Integration**: Integrate `stellar-address-kit`.
+2. **Library Integration**: Integrate `@redishfish/bluewhale-core`.
 3. **Internal Exposure**: Start exposing M-addresses to users as their deposit address.
 4. **Monitoring**: Watch for `MEMO_PRESENT_WITH_MUXED` warnings—these indicate senders using both forms simultaneously.

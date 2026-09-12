@@ -26,7 +26,7 @@ class App extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Stellar Address Kit Demo',
+        title: 'Bluewhale Demo',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,

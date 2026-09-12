@@ -2,7 +2,7 @@
 
 When your Flutter wallet application needs to track incoming payments, it must listen to the Stellar network (Horizon or Soroban RPC) and appropriately identify the destination of the incoming funds.
 
-This guide outlines how to use the Dart implementation of `stellar-address-kit` to reconcile incoming payments.
+This guide outlines how to use the Dart implementation of `@redishfish/bluewhale-core` to reconcile incoming payments.
 
 ## Listening for Payments
 
@@ -14,7 +14,7 @@ Assume you are using the official `stellar_flutter_sdk` to query a user's transa
 
 ```dart
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 
 Future<void> fetchPayments(String userMuxedAddress) async {
   final server = StellarSDK.TESTNET;

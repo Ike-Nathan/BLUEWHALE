@@ -1,6 +1,6 @@
 # Horizon Payment Listener (Go)
 
-A production-grade reference implementation demonstrating deposit routing correctness using the `stellar-address-kit`. This daemon monitors a Stellar Horizon testnet account, extracts routing information from incoming payments, and handles compliance warnings with structured severity tiers.
+A production-grade reference implementation demonstrating deposit routing correctness using the `@redishfish/bluewhale-core`. This daemon monitors a Stellar Horizon testnet account, extracts routing information from incoming payments, and handles compliance warnings with structured severity tiers.
 
 ## What this demonstrates
 This example shows how a backend exchange or payment service can reliably reconcile deposits. It specifically highlights the kit's ability to:
@@ -61,7 +61,7 @@ This implementation explicitly uses `listener.ExtractRouting` (found in `interna
 - **Safety**: Never panics on malformed transaction data; instead, it logs an `alert=true` event for manual review.
 
 ## Link to Core Library
-[Stellar Address Kit (Go)](https://github.com/Boxkit-Labs/stellar-address-kit/tree/main/packages/core-go)
+[Bluewhale (Go)](https://github.com/REDISHFISH/BLUEWHALE/tree/main/packages/core-go)
 
 ## License
 MIT

@@ -1,4 +1,4 @@
-import 'package:stellar_address_kit/src/util/strkey.dart';
+import 'package:bluewhale_core/src/util/strkey.dart';
 
 void main() {
   const m =

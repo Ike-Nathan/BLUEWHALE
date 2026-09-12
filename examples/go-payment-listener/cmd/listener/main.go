@@ -7,9 +7,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Boxkit-Labs/stellar-address-kit/examples/go-payment-listener/internal/config"
-	"github.com/Boxkit-Labs/stellar-address-kit/examples/go-payment-listener/internal/listener"
-	"github.com/Boxkit-Labs/stellar-address-kit/examples/go-payment-listener/internal/metrics"
+	"github.com/REDISHFISH/BLUEWHALE/examples/go-payment-listener/internal/config"
+	"github.com/REDISHFISH/BLUEWHALE/examples/go-payment-listener/internal/listener"
+	"github.com/REDISHFISH/BLUEWHALE/examples/go-payment-listener/internal/metrics"
 	"github.com/rs/zerolog"
 	"github.com/stellar/go/clients/horizonclient"
 )

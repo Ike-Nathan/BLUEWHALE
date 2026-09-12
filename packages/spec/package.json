@@ -1,7 +1,7 @@
 {
-  "name": "@stellar-address-kit/spec",
+  "name": "@redishfish/bluewhale-spec",
   "version": "1.0.0",
-  "description": "Shared JSON test vectors and schema for Stellar Address Kit",
+  "description": "Shared JSON test vectors and schema for Bluewhale",
   "main": "index.js",
   "types": "index.d.ts",
   "files": [

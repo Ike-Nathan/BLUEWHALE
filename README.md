@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Stellar-Address_Kit-3E1BDB?style=for-the-badge" alt="Stellar Address Kit" />
+  <img src="https://img.shields.io/badge/Bluewhale-3E1BDB?style=for-the-badge" alt="Bluewhale" />
 </p>
 
 <p align="center">
@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Documentation-Live-blue?style=for-the-badge&logo=gitbook&logoColor=white" alt="Docs" />
 </p>
 
-**Stellar Address Kit** is a specialized, multi-language library designed to solve the complexity of deposit routing on the Stellar network. It provides a unified, spec-compliant way to handle G-addresses (classic), M-addresses (muxed), and C-addresses (contracts) across TypeScript, Go, and Dart.
+**Bluewhale** is a specialized, multi-language library designed to solve the complexity of deposit routing on the Stellar network. It provides a unified, spec-compliant way to handle G-addresses (classic), M-addresses (muxed), and C-addresses (contracts) across TypeScript, Go, and Dart.
 
 ## Use Cases
 
@@ -26,27 +26,27 @@
 
 ## Documentation
 
-For full technical specifications, architecture deep-dives, and API references, visit our [Live Documentation](https://stellaraddresskit.mintlify.app/docs/introduction).
+For full technical specifications, architecture deep-dives, and API references, visit our [Live Documentation](https://bluewhale.mintlify.app/docs/introduction).
 
-- **[Quickstart](https://stellaraddresskit.mintlify.app/docs/quickstart)**: Get running in under 60 seconds.
-- **[Routing Logic](https://stellaraddresskit.mintlify.app/docs/concepts/routing-logic)**: Complete reference of all routing scenarios.
-- **[Common Mistakes](https://stellaraddresskit.mintlify.app/docs/common-mistakes)**: Avoid the 6 most common integration pitfalls.
-- **[Language Guides](https://stellaraddresskit.mintlify.app/docs/guides/go-deposit-routing)**: Specialized guides for Go, TypeScript, and Flutter.
+- **[Quickstart](https://bluewhale.mintlify.app/docs/quickstart)**: Get running in under 60 seconds.
+- **[Routing Logic](https://bluewhale.mintlify.app/docs/concepts/routing-logic)**: Complete reference of all routing scenarios.
+- **[Common Mistakes](https://bluewhale.mintlify.app/docs/common-mistakes)**: Avoid the 6 most common integration pitfalls.
+- **[Language Guides](https://bluewhale.mintlify.app/docs/guides/go-deposit-routing)**: Specialized guides for Go, TypeScript, and Flutter.
 
 ## Packages
 
 | Platform           | Package               | Install                                                              |
 | ------------------ | --------------------- | -------------------------------------------------------------------- |
-| **TypeScript**     | `stellar-address-kit` | `npm install stellar-address-kit`                                    |
-| **Go**             | `core-go`             | `go get github.com/Boxkit-Labs/stellar-address-kit/packages/core-go` |
-| **Dart / Flutter** | `stellar_address_kit` | `dart pub add stellar_address_kit`                                   |
+| **TypeScript**     | `@redishfish/bluewhale-core` | `npm install @redishfish/bluewhale-core`                                    |
+| **Go**             | `core-go`             | `go get github.com/REDISHFISH/BLUEWHALE/packages/core-go` |
+| **Dart / Flutter** | `bluewhale_core` | `dart pub add bluewhale_core`                                   |
 
 ## Quick Example
 
 Extract canonical routing information from any address type (G, M, or C) with zero-throw safety.
 
 ```typescript
-import { extractRouting } from "stellar-address-kit";
+import { extractRouting } from "@redishfish/bluewhale-core";
 
 // Handles M-addresses, G-addresses with memos, and C-addresses
 const result = extractRouting({

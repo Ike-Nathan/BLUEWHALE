@@ -9,7 +9,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.3"
-  stellar_address_kit:
+  bluewhale_core:
     dependency: "direct main"
     description:
       path: "../../../packages/core-dart"

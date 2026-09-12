@@ -8,10 +8,10 @@ Muxed accounts (M-addresses) allow you to identify sub-accounts without relying 
 
 ## Integration Flow
 
-When using the `stellar-address-kit`, your integration layer becomes simpler:
+When using the `@redishfish/bluewhale-core`, your integration layer becomes simpler:
 
 ```typescript
-import { extractRouting } from "stellar-address-kit";
+import { extractRouting } from "@redishfish/bluewhale-core";
 
 const result = extractRouting({
   destination: payment.destination,
@@ -34,7 +34,7 @@ if (result.routingSource === "muxed") {
 2. Check if memo is present and correct type.
 3. Parse memo string manually.
 
-### After (With `stellar-address-kit`)
+### After (With `@redishfish/bluewhale-core`)
 
 1. Call `extractRouting(input)`.
 2. Check `result.routingSource` (can be `muxed` or `memo`).

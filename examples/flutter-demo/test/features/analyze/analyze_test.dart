@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stellar_address_kit_demo/features/analyze/domain/usecases/analyze_address.dart';
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_demo/features/analyze/domain/usecases/analyze_address.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 
 void main() {
   group('AnalyzeAddress UseCase', () {

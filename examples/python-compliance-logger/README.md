@@ -4,7 +4,7 @@ A Python CLI tool that reads a CSV of Stellar deposit addresses, classifies
 each one by address type (G / M / C) and risk label, writes an annotated
 output CSV, and prints a formatted summary table to `stderr`.
 
-Implements [issue #256](https://github.com/Boxkit-Labs/stellar-address-kit/issues/256).
+Implements [issue #256](https://github.com/REDISHFISH/BLUEWHALE/issues/256).
 
 ## Requirements
 

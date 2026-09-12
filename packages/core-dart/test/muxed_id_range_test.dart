@@ -20,7 +20,7 @@
 library;
 
 import 'package:test/test.dart';
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 
 void main() {
   // Valid Stellar G-address taken from muxed_test.dart

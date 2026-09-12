@@ -1,0 +1,22 @@
+{
+  "name": "@redishfish/bluewhale",
+  "version": "0.1.0",
+  "description": "Bluewhale – React UI components (address input, type badge, warnings, memo)",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"no tests\""
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "react": "^18.2.0",
+    "typescript": "^5.4.5"
+  }
+}

@@ -26,7 +26,7 @@ to hand-roll these guards:
 ### `isWebJsRuntime` — conditional compilation probe
 
 ```dart
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 
 if (isWebJsRuntime) {
   // Compiled to JavaScript: Dart `int` is a JS `Number` here.

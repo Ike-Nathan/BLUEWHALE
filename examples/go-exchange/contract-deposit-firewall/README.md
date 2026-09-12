@@ -1,6 +1,6 @@
 # Contract Deposit Firewall
 
-This example demonstrates security-oriented deposit filtering using stellar-address-kit's C-address warnings. It maps routing warnings and address types to specific deposit decisions: auto-credit for standard G-addresses, manual review for potential misrouting, or quarantine for contract-based deposits.
+This example demonstrates security-oriented deposit filtering using @redishfish/bluewhale-core's C-address warnings. It maps routing warnings and address types to specific deposit decisions: auto-credit for standard G-addresses, manual review for potential misrouting, or quarantine for contract-based deposits.
 
 ## Quick Start
 
@@ -15,4 +15,4 @@ memo-ignored      -> manual-review
 muxed-account     -> auto-credit
 invalid-checksum  -> quarantine
 
-[Back to stellar-address-kit](https://github.com/Boxkit-Labs/stellar-address-kit)
+[Back to bluewhale](https://github.com/REDISHFISH/BLUEWHALE)

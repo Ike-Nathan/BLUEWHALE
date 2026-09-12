@@ -1,8 +1,8 @@
 {
-  "name": "Stellar Address Kit",
+  "name": "Bluewhale",
   "logo": {
-    "light": "https://img.shields.io/badge/Stellar-Address_Kit-3E1BDB?style=for-the-badge",
-    "dark": "https://img.shields.io/badge/Stellar-Address_Kit-A78BFA?style=for-the-badge"
+    "light": "https://img.shields.io/badge/Bluewhale-3E1BDB?style=for-the-badge",
+    "dark": "https://img.shields.io/badge/Bluewhale-A78BFA?style=for-the-badge"
   },
   "favicon": "/favicon.png",
   "colors": {
@@ -13,19 +13,19 @@
   "topbarLinks": [
     {
       "name": "GitHub",
-      "url": "https://github.com/Boxkit-Labs/stellar-address-kit"
+      "url": "https://github.com/REDISHFISH/BLUEWHALE"
     }
   ],
   "anchors": [
     {
       "name": "NPM",
       "icon": "npm",
-      "url": "https://www.npmjs.com/package/stellar-address-kit"
+      "url": "https://www.npmjs.com/package/@redishfish/bluewhale-core"
     },
     {
       "name": "Pub.dev",
       "icon": "dart",
-      "url": "https://pub.dev/packages/stellar_address_kit"
+      "url": "https://pub.dev/packages/bluewhale_core"
     }
   ],
   "navigation": [
@@ -94,22 +94,22 @@
   "footerLinks": [
     {
       "name": "MIT License",
-      "url": "https://github.com/Boxkit-Labs/stellar-address-kit/blob/main/LICENSE"
+      "url": "https://github.com/REDISHFISH/BLUEWHALE/blob/main/LICENSE"
     },
     {
       "name": "NPM",
-      "url": "https://www.npmjs.com/package/stellar-address-kit"
+      "url": "https://www.npmjs.com/package/@redishfish/bluewhale-core"
     },
     {
       "name": "Pub.dev",
-      "url": "https://pub.dev/packages/stellar_address_kit"
+      "url": "https://pub.dev/packages/bluewhale_core"
     },
     {
       "name": "Go Reference",
-      "url": "https://pkg.go.dev/github.com/Boxkit-Labs/stellar-address-kit/packages/core-go"
+      "url": "https://pkg.go.dev/github.com/REDISHFISH/BLUEWHALE/packages/core-go"
     }
   ],
   "footerSocials": {
-    "github": "https://github.com/Boxkit-Labs/stellar-address-kit"
+    "github": "https://github.com/REDISHFISH/BLUEWHALE"
   }
 }

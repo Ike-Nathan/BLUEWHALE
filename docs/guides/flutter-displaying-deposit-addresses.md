@@ -2,7 +2,7 @@
 
 When building a Stellar wallet in Flutter, one of the first features you'll need is the ability to generate and display a deposit address for your users. If you are using a pooled account architecture, you must provide the user with both the base address and a unique memo or muxed ID.
 
-This guide explains how to leverage the `stellar-address-kit` to safely format and display deposit addresses in a Flutter UI.
+This guide explains how to leverage the `@redishfish/bluewhale-core` to safely format and display deposit addresses in a Flutter UI.
 
 ## Prerequisites
 
@@ -10,7 +10,7 @@ Make sure you have added the `core-dart` package to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  stellar_address_kit: ^1.0.0
+  bluewhale_core: ^1.0.0
 ```
 
 ## Muxed Addresses vs. Base Address + Memo
@@ -19,14 +19,14 @@ You have two primary ways to display a deposit address to a user:
 1. **Muxed Address (M-Address):** A single string starting with `M` that encodes both the base `G` address and a 64-bit integer ID.
 2. **Base Address + Memo:** Displaying the `G` address and a separate `Memo` field (often a Memo ID or Memo Text).
 
-The `stellar-address-kit` helps you easily convert between these representations to support whatever UI format you prefer.
+The `@redishfish/bluewhale-core` helps you easily convert between these representations to support whatever UI format you prefer.
 
 ## Displaying a Muxed Address
 
 If your backend issues a user ID (e.g., `123456789`) and your pooled account is `GA...`, you can encode this into a Muxed Address.
 
 ```dart
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 
 // Your pooled account base address
 final String baseAddress = 'GA7QYNF7SOWQ3GLR2B6RS22TBGZAOR6KLYH4PA5ZAM73A3H4K2HZZSQU';
@@ -46,7 +46,7 @@ Many exchanges and wallets still prompt users for a Memo explicitly. If you pref
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:stellar_address_kit/stellar_address_kit.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
 
 class DepositScreen extends StatelessWidget {
   final String baseAddress = 'GA7QYNF7SOWQ3GLR2B6RS22TBGZAOR6KLYH4PA5ZAM73A3H4K2HZZSQU';
@@ -89,4 +89,4 @@ if (AddressValidator.isValid(userInput)) {
 ```
 
 ## Summary
-Using `stellar-address-kit` in Flutter ensures that whenever you display or parse an address, you are strictly following standard Stellar SEP specifications, drastically reducing the risk of lost user funds.
+Using `@redishfish/bluewhale-core` in Flutter ensures that whenever you display or parse an address, you are strictly following standard Stellar SEP specifications, drastically reducing the risk of lost user funds.

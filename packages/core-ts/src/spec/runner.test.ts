@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { vectors } from "@stellar-address-kit/spec";
+import { vectors } from "@redishfish/bluewhale-spec";
 import { detect, encodeMuxed, decodeMuxed, extractRouting } from "../index";
 import { ExtractRoutingError } from "../routing/extract";
 

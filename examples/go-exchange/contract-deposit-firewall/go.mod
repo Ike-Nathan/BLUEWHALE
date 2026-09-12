@@ -1,5 +1,5 @@
-module github.com/stellar-address-kit/examples/contract-deposit-firewall
+module github.com/@redishfish/bluewhale-core/examples/contract-deposit-firewall
 
 go 1.22
 
-require github.com/Boxkit-Labs/stellar-address-kit/packages/core-go v1.0.1
+require github.com/REDISHFISH/BLUEWHALE/packages/core-go v1.0.1

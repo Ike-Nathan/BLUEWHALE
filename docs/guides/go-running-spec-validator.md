@@ -1,6 +1,6 @@
 # Running the Spec Validator (Go)
 
-The `stellar-address-kit` aims to provide identical behavior across TypeScript, Go, and Dart. To guarantee this, the project relies on a shared `vectors.json` file located at the root of the repository. 
+The `@redishfish/bluewhale-core` aims to provide identical behavior across TypeScript, Go, and Dart. To guarantee this, the project relies on a shared `vectors.json` file located at the root of the repository. 
 
 This JSON file contains hundreds of test cases (valid addresses, invalid formats, boundary values) that every SDK implementation must pass.
 
@@ -38,7 +38,7 @@ You should see output indicating that the JSON vectors were loaded and successfu
 ...
 --- PASS: TestSpecVectors (0.05s)
 PASS
-ok      github.com/Boxkit-Labs/stellar-address-kit/core-go    0.060s
+ok      github.com/REDISHFISH/BLUEWHALE/core-go    0.060s
 ```
 
 ## How the Validator Works in Go
@@ -53,7 +53,7 @@ import (
     "os"
     "testing"
     "path/filepath"
-    addresskit "github.com/Boxkit-Labs/stellar-address-kit/core-go"
+    addresskit "github.com/REDISHFISH/BLUEWHALE/core-go"
 )
 
 type Vector struct {

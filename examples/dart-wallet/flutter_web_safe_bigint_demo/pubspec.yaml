@@ -11,7 +11,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^8.1.0
   equatable: ^2.0.0
-  stellar_address_kit: ^1.0.1
+  bluewhale_core: ^1.0.1
 
 dev_dependencies:
   flutter_test:
