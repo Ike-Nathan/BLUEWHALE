@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.0.0",
+  "spec_version": "1.0.1",
   "description": "Normative test vectors for the Bluewhale. This file is the single source of truth for routing logic across TypeScript, Go, and Dart implementations. Any change to routing behavior MUST start here.",
   "cases": [
     {
@@ -135,6 +135,17 @@
       },
       "expected": {
         "expected_error": "invalid encoded string"
+      },
+      "tags": ["negative", "edge"]
+    },
+    {
+      "module": "muxed_decode",
+      "description": "M-address with non-zero trailing unused bits in Base32 encoding must return decode error",
+      "input": {
+        "mAddress": "MAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQACAAAAAAAAAAAAD673"
+      },
+      "expected": {
+        "expected_error": "unused bits in base32 encoding must be zero"
       },
       "tags": ["negative", "edge"]
     },
