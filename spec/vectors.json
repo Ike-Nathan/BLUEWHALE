@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.0.0",
+  "spec_version": "1.0.1",
   "description": "Normative test vectors for the Bluewhale. This file is the single source of truth for routing logic across TypeScript, Go, and Dart implementations. Any change to routing behavior MUST start here.",
   "cases": [
     {
@@ -273,6 +273,50 @@
         ]
       },
       "tags": ["negative", "edge"]
+    },
+    {
+      "module": "extract_routing",
+      "description": "MEMO_TEXT 28-byte multi-byte UTF-8 sequence at valid limit but unroutable non-numeric",
+      "input": {
+        "destination": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
+        "memoType": "text",
+        "memoValue": "🐋🐋🐋🐋🐋🐋🐋"
+      },
+      "expected": {
+        "destinationBaseAccount": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
+        "routingId": null,
+        "routingSource": "none",
+        "warnings": [
+          {
+            "code": "MEMO_TEXT_UNROUTABLE",
+            "severity": "warn",
+            "message": "MEMO_TEXT was not a valid numeric uint64."
+          }
+        ]
+      },
+      "tags": ["negative", "edge", "utf8"]
+    },
+    {
+      "module": "extract_routing",
+      "description": "MEMO_TEXT 29-byte multi-byte UTF-8 sequence exceeding 28-byte limit",
+      "input": {
+        "destination": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
+        "memoType": "text",
+        "memoValue": "🐋🐋🐋🐋🐋🐋🐋a"
+      },
+      "expected": {
+        "destinationBaseAccount": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
+        "routingId": null,
+        "routingSource": "none",
+        "warnings": [
+          {
+            "code": "MEMO_TEXT_UNROUTABLE",
+            "severity": "warn",
+            "message": "MEMO_TEXT was not a valid numeric uint64."
+          }
+        ]
+      },
+      "tags": ["negative", "edge", "utf8"]
     },
     {
       "module": "detect",
