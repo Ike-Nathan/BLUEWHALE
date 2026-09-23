@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.0.0",
+  "spec_version": "1.1.0",
   "description": "Normative test vectors for the Bluewhale. This file is the single source of truth for routing logic across TypeScript, Go, and Dart implementations. Any change to routing behavior MUST start here.",
   "cases": [
     {
@@ -330,6 +330,99 @@
         ]
       },
       "tags": ["negative", "edge"]
+    },
+    {
+      "module": "extract_from_uri",
+      "description": "valid web+stellar:pay URI with G-destination and MEMO_ID",
+      "input": {
+        "uri": "web+stellar:pay?destination=GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI&memo=12345&memo_type=MEMO_ID"
+      },
+      "expected": {
+        "success": true,
+        "routing": {
+          "destinationBaseAccount": "GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI",
+          "routingId": "12345",
+          "routingSource": "memo",
+          "warnings": []
+        }
+      },
+      "tags": ["positive", "interop"]
+    },
+    {
+      "module": "extract_from_uri",
+      "description": "valid web+stellar:pay URI with numeric MEMO_TEXT",
+      "input": {
+        "uri": "web+stellar:pay?destination=GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI&memo=98765&memo_type=MEMO_TEXT"
+      },
+      "expected": {
+        "success": true,
+        "routing": {
+          "destinationBaseAccount": "GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI",
+          "routingId": "98765",
+          "routingSource": "memo",
+          "warnings": []
+        }
+      },
+      "tags": ["positive"]
+    },
+    {
+      "module": "extract_from_uri",
+      "description": "valid web+stellar:pay URI with URL-encoded parameters",
+      "input": {
+        "uri": "web+stellar:pay?destination=%20GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI%20&amount=10.5&memo=hello%20world&memo_type=MEMO_TEXT"
+      },
+      "expected": {
+        "success": true,
+        "routing": {
+          "destinationBaseAccount": "GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI",
+          "routingId": null,
+          "routingSource": "none",
+          "warnings": [
+            {
+              "code": "MEMO_TEXT_UNROUTABLE",
+              "severity": "warn",
+              "message": "MEMO_TEXT was not a valid numeric uint64."
+            }
+          ]
+        }
+      },
+      "tags": ["positive", "edge"]
+    },
+    {
+      "module": "extract_from_uri",
+      "description": "reject URI with invalid scheme",
+      "input": {
+        "uri": "https://example.com/pay?destination=GAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQADRSI"
+      },
+      "expected": {
+        "success": false,
+        "code": "INVALID_URI"
+      },
+      "tags": ["negative", "edge"]
+    },
+    {
+      "module": "extract_from_uri",
+      "description": "reject URI with unsupported operation",
+      "input": {
+        "uri": "web+stellar:tx?xdr=AAAA"
+      },
+      "expected": {
+        "success": false,
+        "code": "UNSUPPORTED_OPERATION"
+      },
+      "tags": ["negative"]
+    },
+    {
+      "module": "extract_from_uri",
+      "description": "reject URI with missing destination",
+      "input": {
+        "uri": "web+stellar:pay?amount=100"
+      },
+      "expected": {
+        "success": false,
+        "code": "MISSING_DESTINATION"
+      },
+      "tags": ["negative"]
     }
   ]
 }
