@@ -1,4 +1,8 @@
-import { isSuccessfulURIResult, extractRoutingFromURI } from "./extractFromURI";
+import {
+  isSuccessfulURIResult,
+  extractRoutingFromURI,
+  sanitizeSep7UriForLogging,
+} from "./extractFromURI";
 
 describe("extractRoutingFromURI", () => {
   describe("scheme validation", () => {
@@ -184,6 +188,39 @@ describe("extractRoutingFromURI", () => {
     it("returns false for failed results", () => {
       const result = extractRoutingFromURI("invalid");
       expect(isSuccessfulURIResult(result)).toBe(false);
+    });
+  });
+
+  describe("query parameter sanitization", () => {
+    it("redacts sensitive keys in sanitizeSep7UriForLogging", () => {
+      const sanitized = sanitizeSep7UriForLogging(
+        "secret_op?destination=GABC&signature=supersecret&callback=https://secret.com&memo=confidential&msg=hello"
+      );
+      expect(sanitized).toContain("signature=[REDACTED]");
+      expect(sanitized).toContain("callback=[REDACTED]");
+      expect(sanitized).toContain("memo=[REDACTED]");
+      expect(sanitized).toContain("msg=[REDACTED]");
+      expect(sanitized).not.toContain("supersecret");
+      expect(sanitized).not.toContain("secret.com");
+      expect(sanitized).not.toContain("confidential");
+      expect(sanitized).toContain("destination=GABC");
+    });
+
+    it("redacts sensitive query parameters in unsupported operation error descriptions", () => {
+      const result = extractRoutingFromURI(
+        "web+stellar:tx?signature=secret_sig&callback=https://secret.token&memo=my_secret"
+      );
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).not.toContain("secret_sig");
+        expect(result.error).not.toContain("secret.token");
+        expect(result.error).not.toContain("my_secret");
+        expect(result.error).toContain("[REDACTED]");
+      }
+    });
+
+    it("leaves query-less input untouched", () => {
+      expect(sanitizeSep7UriForLogging("unknown_op")).toBe("unknown_op");
     });
   });
 });
