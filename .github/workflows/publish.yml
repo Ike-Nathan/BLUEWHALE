@@ -3,6 +3,13 @@ on:
   push:
     tags:
       - 'v*'
+  # Dry-run the publish on PRs that touch the published packages or this
+  # workflow, so a broken manifest or build is caught before a release tag.
+  pull_request:
+    paths:
+      - 'packages/core-ts/**'
+      - 'packages/bluewhale/**'
+      - '.github/workflows/publish.yml'
 
 jobs:
   publish:
@@ -24,10 +31,30 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - run: pnpm install
-      
+
+      # bluewhale depends on bluewhale-core, so core must be built first.
       - run: pnpm --filter @redishfish/bluewhale-core build
 
-      - name: Publish to NPM
+      - run: pnpm --filter @redishfish/bluewhale build
+
+      - name: Verify @redishfish/bluewhale build output
+        run: |
+          test -f packages/bluewhale/dist/index.js
+          test -f packages/bluewhale/dist/index.d.ts
+
+      - name: Dry-run publish
+        run: |
+          pnpm --filter @redishfish/bluewhale-core publish --dry-run --no-git-checks --access public
+          pnpm --filter @redishfish/bluewhale publish --dry-run --no-git-checks --access public
+
+      - name: Publish @redishfish/bluewhale-core to NPM
+        if: startsWith(github.ref, 'refs/tags/v')
         run: pnpm --filter @redishfish/bluewhale-core publish --no-git-checks --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @redishfish/bluewhale to NPM
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: pnpm --filter @redishfish/bluewhale publish --no-git-checks --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
