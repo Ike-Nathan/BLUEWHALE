@@ -159,10 +159,20 @@ export function extractRouting(input: RoutingInput): RoutingResult {
 
     if (norm.normalized) {
       // Explicit bigint parsing for MEMO_ID to avoid Number precision issues.
-      const parsedMemoId = BigInt(norm.normalized);
-      routingId = parsedMemoId.toString();
-      routingSource = "memo";
-      warnings.push(...norm.warnings);
+      try {
+        const parsedMemoId = BigInt(norm.normalized);
+        routingId = parsedMemoId.toString();
+        routingSource = "memo";
+        warnings.push(...norm.warnings);
+      } catch {
+        routingSource = "none";
+        warnings.push(...norm.warnings);
+        warnings.push({
+          code: "MEMO_ID_INVALID_FORMAT",
+          severity: "warn",
+          message: "MEMO_ID was empty, non-numeric, or exceeded uint64 max.",
+        });
+      }
     } else {
       routingSource = "none";
       warnings.push(...norm.warnings);
