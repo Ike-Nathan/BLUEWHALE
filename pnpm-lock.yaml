@@ -9,6 +9,10 @@ importers:
   .: {}
 
   packages/bluewhale:
+    dependencies:
+      '@redishfish/bluewhale-core':
+        specifier: workspace:^
+        version: link:../core-ts
     devDependencies:
       '@types/react':
         specifier: ^18.2.0

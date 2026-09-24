@@ -25,6 +25,9 @@
     "prepublishOnly": "pnpm run build",
     "test": "echo \"no tests\""
   },
+  "dependencies": {
+    "@redishfish/bluewhale-core": "workspace:^"
+  },
   "peerDependencies": {
     "react": ">=17.0.0"
   },
