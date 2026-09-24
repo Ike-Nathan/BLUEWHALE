@@ -139,6 +139,17 @@
       "tags": ["negative", "edge"]
     },
     {
+      "module": "muxed_decode",
+      "description": "M-address with non-zero trailing unused bits in Base32 encoding must return decode error",
+      "input": {
+        "mAddress": "MAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQACAAAAAAAAAAAAD673"
+      },
+      "expected": {
+        "expected_error": "unused bits in base32 encoding must be zero"
+      },
+      "tags": ["negative", "edge"]
+    },
+    {
       "module": "detect",
       "description": "lowercase G accepted with normalization warning",
       "input": {
