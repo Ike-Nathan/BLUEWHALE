@@ -1,4 +1,4 @@
-import { isSuccessfulURIResult, extractRoutingFromURI } from "./extractFromURI";
+import { isSuccessfulURIResult, extractRoutingFromURI, sanitizeSep7UriForLogging } from "./extractFromURI";
 
 describe("extractRoutingFromURI", () => {
   describe("scheme validation", () => {
@@ -184,6 +184,49 @@ describe("extractRoutingFromURI", () => {
     it("returns false for failed results", () => {
       const result = extractRoutingFromURI("invalid");
       expect(isSuccessfulURIResult(result)).toBe(false);
+    });
+  });
+
+  describe("query sanitization for errors/logs (issue #36)", () => {
+    const SECRET = "sig-topsecret-123";
+    const CALLBACK = "https://cb.example/hook?token=abc";
+
+    it("redacts signature and callback values", () => {
+      const out = sanitizeSep7UriForLogging(
+        `web+stellar:pay?destination=GABC&signature=${SECRET}&callback=${encodeURIComponent(CALLBACK)}`
+      );
+      expect(out).not.toContain(SECRET);
+      expect(out).not.toContain("token=abc");
+      expect(out).toContain("signature=[REDACTED]");
+      expect(out).toContain("callback=[REDACTED]");
+      expect(out).toContain("destination=GABC");
+    });
+
+    it("redacts memo and msg values", () => {
+      const out = sanitizeSep7UriForLogging(
+        "web+stellar:pay?destination=GABC&memo=personal-note&msg=hello"
+      );
+      expect(out).not.toContain("personal-note");
+      expect(out).not.toContain("hello");
+    });
+
+    it("leaves URIs without a query string untouched", () => {
+      expect(sanitizeSep7UriForLogging("web+stellar:pay")).toBe("web+stellar:pay");
+    });
+
+    it("never leaks secrets through failure error descriptions", () => {
+      const hostile = [
+        `web+stellar:tx?signature=${SECRET}`,
+        `https://example.com/pay?signature=${SECRET}&callback=x`,
+        `web+stellar:pay?signature=${SECRET}`,
+        "",
+      ];
+      for (const uri of hostile) {
+        const result = extractRoutingFromURI(uri);
+        if (!result.success) {
+          expect(result.error).not.toContain(SECRET);
+        }
+      }
     });
   });
 });
