@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { TypeBadge, AddressType } from './components/TypeBadge';
-import { WarningList } from './components/WarningList';
+import { WarningList, WarningItem } from './components/WarningList';
 import { MemoField } from './components/MemoField';
 
 // React 17 has no useId, so generate a per-instance id that stays stable
@@ -11,6 +11,8 @@ const useStableId = (prefix: string): string => {
   if (!ref.current) ref.current = `${prefix}-${++idCounter}`;
   return ref.current;
 };
+
+const EMPTY_WARNINGS: WarningItem[] = [];
 
 const TYPE_ANNOUNCEMENTS: Record<AddressType, string> = {
   G: 'Standard account address (G) detected.',
@@ -31,7 +33,15 @@ const visuallyHidden: React.CSSProperties = {
   border: 0,
 };
 
-export const AddressInput: React.FC = () => {
+export interface AddressInputProps {
+  /**
+   * Extra warnings from the host app, e.g. core Warning objects such as
+   * MISSING_REQUIRED_MEMO (from checkMemoRequirement) or CONTRACT_SENDER_DETECTED.
+   */
+  warnings?: WarningItem[];
+}
+
+export const AddressInput: React.FC<AddressInputProps> = ({ warnings: externalWarnings = EMPTY_WARNINGS }) => {
   const [address, setAddress] = useState('');
   const [memo, setMemo] = useState('');
 
@@ -49,15 +59,21 @@ export const AddressInput: React.FC = () => {
     return 'UNKNOWN';
   }, [address]);
 
-  const showMemo = type === 'G' || type === 'UNKNOWN';
-
   const warnings = useMemo(() => {
-    const list: string[] = [];
+    const list: WarningItem[] = [];
     if (type === 'C') {
       list.push('Contract addresses cannot be used for standard payments.');
     }
-    return list;
-  }, [type]);
+    return [...list, ...externalWarnings];
+  }, [type, externalWarnings]);
+
+  const warningCodes = useMemo(
+    () => warnings.flatMap((w) => (typeof w !== 'string' && w.code ? [w.code] : [])),
+    [warnings]
+  );
+
+  // A memo-required destination must always expose the memo field.
+  const showMemo = type === 'G' || type === 'UNKNOWN' || warningCodes.includes('MISSING_REQUIRED_MEMO');
 
   // Invalid = unrecognized prefix; unroutable = contract destination.
   const isInvalid = !!address && (type === 'UNKNOWN' || type === 'C');
@@ -70,7 +86,7 @@ export const AddressInput: React.FC = () => {
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
         {type !== 'UNKNOWN' && (
           <div style={{ position: 'absolute', left: '0.5rem' }} aria-hidden="true">
-            <TypeBadge type={type} />
+            <TypeBadge type={type} warningCodes={warningCodes} />
           </div>
         )}
         <input
