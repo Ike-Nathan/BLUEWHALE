@@ -2,13 +2,17 @@ import React from 'react';
 
 interface WarningListProps {
   warnings: string[];
+  /** DOM id so inputs can reference this list via aria-describedby. */
+  id?: string;
 }
 
-export const WarningList: React.FC<WarningListProps> = ({ warnings }) => {
+export const WarningList: React.FC<WarningListProps> = ({ warnings, id }) => {
   if (!warnings || warnings.length === 0) return null;
 
   return (
     <div
+      id={id}
+      role="alert"
       style={{
         marginTop: '0.5rem',
         padding: '0.75rem',
@@ -20,7 +24,7 @@ export const WarningList: React.FC<WarningListProps> = ({ warnings }) => {
       }}
     >
       <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>
-        ⚠️ Warnings:
+        <span aria-hidden="true">⚠️ </span>Warnings:
       </div>
       <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
         {warnings.map((warning, idx) => (
