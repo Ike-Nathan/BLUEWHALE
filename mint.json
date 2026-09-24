@@ -55,7 +55,8 @@
         "docs/guides/ts-reconciling-deposits",
         "docs/guides/flutter-deposit-addresses",
         "docs/guides/flutter-incoming-payments",
-        "docs/guides/flutter-web-bigint"
+        "docs/guides/flutter-web-bigint",
+        "docs/guides/react-address-input"
       ]
     },
     {
