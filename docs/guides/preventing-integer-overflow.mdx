@@ -1,0 +1,163 @@
+---
+title: "Preventing Integer Overflow"
+description: "Safe handling of uint64 routing IDs in JavaScript and Flutter Web to avoid silent fund loss."
+---
+
+Stellar routing IDs are unsigned 64-bit integers (uint64), with a maximum value of `18,446,744,073,709,551,615`. Parsing them carelessly in JavaScript or Dart on the web causes **silent precision loss** — the value is corrupted without any error being thrown, leading to misrouted or lost funds.
+
+## Why JavaScript Loses Precision
+
+JavaScript uses IEEE-754 double-precision floating-point for all numbers. This format has a 53-bit mantissa, giving a safe integer range of:
+
+```
+Number.MIN_SAFE_INTEGER = -9,007,199,254,740,991  (-(2^53 - 1))
+Number.MAX_SAFE_INTEGER =  9,007,199,254,740,991  (2^53 - 1)
+```
+
+Any integer above `2^53 - 1` **cannot be represented exactly** as a JS `number`. The runtime silently rounds to the nearest representable value:
+
+```js
+// ❌ BEFORE — silent precision loss
+const id = Number("9007199254740993"); // 2^53 + 1
+console.log(id); // 9007199254740992  ← off by 1, no error!
+console.log(id === 9007199254740992); // true — silently wrong
+```
+
+A routing ID that is corrupted by one digit will never match a user record, and the deposit will fail reconciliation with no obvious cause.
+
+## The Safe Pattern: Use BigInt
+
+`BigInt` is natively supported in all modern browsers (Chrome 67+, Firefox 68+, Safari 14+, Edge 79+) and Node.js 10.3+. Always use `BigInt` when handling routing IDs:
+
+```js
+// ✅ AFTER — exact representation with BigInt
+const id = BigInt("9007199254740993"); // 2^53 + 1
+console.log(id.toString()); // "9007199254740993" — exact
+console.log(id === 9007199254740993n); // true
+```
+
+### TypeScript: Parsing and Comparing Routing IDs
+
+```ts
+import { extractRouting } from "@redishfish/bluewhale-core";
+
+const result = extractRouting({
+  address:
+    "MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBAAAAAAAAAAAAABQD",
+});
+
+// ❌ BEFORE — converts routingId string to number, loses precision above 2^53
+const routingNum = Number(result.routingId); // potentially wrong
+
+// ✅ AFTER — keep as string or parse with BigInt
+const routingStr: string = result.routingId; // "123" — always safe
+const routingBig: bigint = BigInt(result.routingId); // for arithmetic
+
+// Store and compare as strings in your database
+if (routingStr === userRecord.depositId) {
+  creditUserAccount(userRecord);
+}
+```
+
+### JSON Serialization
+
+JSON does not have a native `BigInt` type, so serialization requires explicit handling:
+
+```ts
+// ❌ BEFORE — JSON.stringify silently drops BigInt or throws
+const payload = JSON.stringify({ id: routingBig }); // TypeError or loss
+
+// ✅ AFTER — serialize as a string
+const payload = JSON.stringify({ id: routingStr });
+// {"id":"9007199254740993"}
+
+// ✅ AFTER — custom replacer for BigInt values
+const safeStringify = (obj: unknown) =>
+  JSON.stringify(obj, (_key, value) =>
+    typeof value === "bigint" ? value.toString() : value
+  );
+```
+
+<Warning>
+  Never store a routing ID in a JavaScript `number`. Always use `string` for storage and transit, and `BigInt` only for arithmetic operations.
+</Warning>
+
+## Flutter Web: The Same Problem in Dart
+
+Flutter Web compiles Dart to JavaScript. Dart's `int` type on Web maps directly to a JS `Number`, which means the same IEEE-754 precision ceiling applies. A Dart `int` on Web cannot safely hold values above `2^53 - 1`.
+
+```dart
+// ❌ BEFORE — int.parse on Web truncates values above 2^53 - 1
+int id = int.parse('9007199254740993'); // silently becomes 9007199254740992
+print(id); // 9007199254740992 — one unit off, no exception
+```
+
+### Use SafeRoutingId on Flutter Web
+
+The `bluewhale_core` package ships `SafeRoutingId`, a `BigInt`-backed wrapper that never routes the value through a Dart `int` on Web:
+
+```dart
+import 'package:bluewhale_core/bluewhale_core.dart';
+
+// ✅ AFTER — SafeRoutingId uses BigInt internally on all platforms
+final id = SafeRoutingId.parse('9007199254740993');
+print(id.value);              // '9007199254740993' — exact in the browser
+print(id.toJson());           // '9007199254740993' — safe to jsonEncode
+print(id.exceedsJsSafeRange); // true — explicit safety flag
+```
+
+Access the safe ID directly from a routing result:
+
+```dart
+final result = extractRouting(RoutingInput(
+  address: 'MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBAAAAAAAAAAAAABQD',
+));
+
+// ❌ BEFORE — may lose precision on Web
+final routingInt = result.routingIdInt; // truncated above 2^53 on Web
+
+// ✅ AFTER — always safe across native and Web builds
+final routingStr = result.idString;   // String — exact on all platforms
+final safeId    = result.safeId;      // SafeRoutingId — BigInt-backed
+```
+
+### Detecting the Web Runtime
+
+Use the `isWebJsRuntime` constant when you need conditional behavior:
+
+```dart
+import 'package:bluewhale_core/bluewhale_core.dart';
+
+if (isWebJsRuntime) {
+  // Running in a browser — never use int for routing IDs
+  processWithSafeId(result.safeId);
+} else {
+  // Native platform — int is safe
+  processWithInt(result.routingIdInt);
+}
+```
+
+## Overflow Boundaries Reference
+
+| Value              | Decimal                     | Safe in JS `number`? | Safe in Dart `int` on Web? |
+| :----------------- | :-------------------------- | :------------------- | :------------------------- |
+| `2^53 - 1`         | `9,007,199,254,740,991`     | ✅ Yes (max safe)    | ✅ Yes                     |
+| `2^53`             | `9,007,199,254,740,992`     | ⚠️ Boundary          | ⚠️ Boundary                |
+| `2^53 + 1`         | `9,007,199,254,740,993`     | ❌ No                | ❌ No                      |
+| `2^63 - 1`         | `9,223,372,036,854,775,807` | ❌ No                | ❌ No                      |
+| `2^64 - 1` (max)   | `18,446,744,073,709,551,615`| ❌ No                | ❌ No                      |
+
+## Quick Checklist
+
+- [ ] Never call `Number(routingId)` or `parseInt(routingId)` on a routing ID.
+- [ ] Always keep routing IDs as `string` when stored in databases or sent over JSON.
+- [ ] Use `BigInt(routingId)` only for arithmetic comparisons.
+- [ ] In Dart/Flutter Web, use `SafeRoutingId.parse()` instead of `int.parse()`.
+- [ ] Use `result.idString` or `result.safeId` instead of any integer accessor.
+- [ ] Run `dart test test/web_compat --platform chrome` to validate boundary behavior.
+
+## Further Reading
+
+- [Flutter Web: BigInt](/docs/guides/flutter-web-bigint) — in-depth coverage of the Flutter Web safety layer.
+- [Warning System](/docs/concepts/warning-system) — how Bluewhale surfaces precision warnings at the API level.
+- [Common Mistakes](/docs/common-mistakes) — the 6 most common integration pitfalls.
