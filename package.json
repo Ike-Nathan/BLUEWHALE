@@ -2,5 +2,8 @@
   "name": "bluewhale",
   "version": "0.1.0",
   "description": "Bluewhale – monorepo",
-  "private": true
+  "private": true,
+  "scripts": {
+    "fuzz:differential": "node scripts/differential-fuzz.js"
+  }
 }
