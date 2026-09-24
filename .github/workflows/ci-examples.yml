@@ -1,0 +1,34 @@
+name: ci-examples
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "examples/go-payment-listener/**"
+      - "packages/core-go/**"
+      - ".github/workflows/ci-examples.yml"
+  pull_request:
+    paths:
+      - "examples/go-payment-listener/**"
+      - "packages/core-go/**"
+      - ".github/workflows/ci-examples.yml"
+
+jobs:
+  go-payment-listener:
+    name: go-payment-listener (build + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/go-payment-listener
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: examples/go-payment-listener/go.mod
+          cache-dependency-path: examples/go-payment-listener/go.sum
+      # go.mod replaces core-go with ../../packages/core-go, so this always
+      # compiles against the latest core-go in the repo.
+      - run: go mod verify
+      - run: go build ./...
+      - run: go vet ./...
+      - run: go test ./...
