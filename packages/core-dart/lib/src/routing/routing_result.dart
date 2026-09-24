@@ -56,7 +56,7 @@ class RoutingWarning {
 
   /// Emitted when the transaction sender is detected as a smart contract.
   static const contractSender = RoutingWarning(
-    code: 'contract-sender',
+    code: 'CONTRACT_SENDER_DETECTED',
     severity: 'info',
     message: 'Contract source detected. Routing state cleared.',
   );

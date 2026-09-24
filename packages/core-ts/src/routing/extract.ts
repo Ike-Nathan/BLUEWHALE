@@ -1,6 +1,7 @@
 import { RoutingInput, RoutingResult } from "./types";
 import { Warning, WarningSeverity } from "../address/types";
 import { parse } from "../address/parse";
+import { detect } from "../address/detect";
 import { AddressParseError } from "../address/errors";
 import { normalizeMemoTextId } from "./memo";
 
@@ -70,6 +71,28 @@ export function extractRouting(input: RoutingInput): RoutingResult {
   assertRoutableAddress(input.destination);
 
   const minSeverity = input.minSeverityLevel ?? "info";
+
+  // Deposits sent by a Soroban contract (C... source) cannot be attributed to
+  // a routing ID, so routing state is cleared. Mirrors core-go and core-dart.
+  if (typeof input.sourceAccount === "string" && input.sourceAccount !== "") {
+    if (detect(input.sourceAccount) === "C") {
+      return {
+        destinationBaseAccount: null,
+        routingId: null,
+        routingSource: "none",
+        warnings: filterBySeverity(
+          [
+            {
+              code: "CONTRACT_SENDER_DETECTED",
+              severity: "info",
+              message: "Contract source detected. Routing state cleared.",
+            },
+          ],
+          minSeverity
+        ),
+      };
+    }
+  }
 
   let parsed;
   try {
