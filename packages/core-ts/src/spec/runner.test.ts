@@ -1,6 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { vectors } from "@redishfish/bluewhale-spec";
-import { detect, encodeMuxed, decodeMuxed, extractRouting } from "../index";
+import {
+  detect,
+  encodeMuxed,
+  decodeMuxed,
+  extractRouting,
+  extractRoutingFromURI,
+} from "../index";
 import { ExtractRoutingError } from "../routing/extract";
 
 const LEGACY_VECTOR_G =
@@ -85,6 +91,23 @@ describe("Normative Vector Tests", () => {
           );
           expect(result.routingSource).toBe(c.expected.routingSource);
           expect(result.warnings).toEqual(c.expected.warnings);
+          break;
+        }
+        case "extract_from_uri": {
+          const result = extractRoutingFromURI(c.input.uri);
+          expect(result.success).toBe(c.expected.success);
+          if (c.expected.success && result.success) {
+            expect(result.routing.destinationBaseAccount).toBe(
+              normalizeExpectedBaseAccount(c.expected.routing.destinationBaseAccount)
+            );
+            expect(normalizeRoutingId(result.routing.routingId)).toBe(
+              normalizeRoutingId(c.expected.routing.routingId)
+            );
+            expect(result.routing.routingSource).toBe(c.expected.routing.routingSource);
+            expect(result.routing.warnings).toEqual(c.expected.routing.warnings);
+          } else if (!c.expected.success && !result.success) {
+            expect(result.code).toBe(c.expected.code);
+          }
           break;
         }
       }

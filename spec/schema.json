@@ -95,7 +95,7 @@
         "properties": {
           "module": {
             "type": "string",
-            "enum": ["detect", "muxed_encode", "muxed_decode", "extract_routing"]
+            "enum": ["detect", "muxed_encode", "muxed_decode", "extract_routing", "extract_from_uri"]
           },
           "description": { "type": "string" },
           "input": { "type": "object" },
