@@ -27,6 +27,17 @@ export class ExtractRoutingError extends Error {
 }
 
 /**
+ * Type guard: true when the string is structurally routable (a G or M
+ * Stellar address). Only G-addresses and M-addresses are valid routing
+ * targets. Never throws — non-strings and empty input return false.
+ */
+export function isRoutableAddress(address: unknown): address is string {
+  if (typeof address !== "string") return false;
+  const prefix = address.trim()[0]?.toUpperCase();
+  return prefix === "G" || prefix === "M";
+}
+
+/**
  * Validates that the destination string passes the minimum structural
  * requirements for a Stellar address before routing logic is applied.
  * Only G-addresses and M-addresses are valid routing targets.
@@ -38,9 +49,7 @@ function assertRoutableAddress(destination: string): void {
       "Invalid input: destination must be a non-empty string."
     );
   }
-
-  const prefix = destination.trim()[0]?.toUpperCase();
-  if (prefix !== "G" && prefix !== "M") {
+  if (!isRoutableAddress(destination)) {
     throw new ExtractRoutingError(
       `Invalid destination: expected a G or M address, got "${destination}".`
     );
@@ -150,10 +159,20 @@ export function extractRouting(input: RoutingInput): RoutingResult {
 
     if (norm.normalized) {
       // Explicit bigint parsing for MEMO_ID to avoid Number precision issues.
-      const parsedMemoId = BigInt(norm.normalized);
-      routingId = parsedMemoId.toString();
-      routingSource = "memo";
-      warnings.push(...norm.warnings);
+      try {
+        const parsedMemoId = BigInt(norm.normalized);
+        routingId = parsedMemoId.toString();
+        routingSource = "memo";
+        warnings.push(...norm.warnings);
+      } catch {
+        routingSource = "none";
+        warnings.push(...norm.warnings);
+        warnings.push({
+          code: "MEMO_ID_INVALID_FORMAT",
+          severity: "warn",
+          message: "MEMO_ID was empty, non-numeric, or exceeded uint64 max.",
+        });
+      }
     } else {
       routingSource = "none";
       warnings.push(...norm.warnings);
