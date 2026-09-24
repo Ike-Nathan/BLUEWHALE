@@ -261,6 +261,74 @@
     },
     {
       "module": "extract_routing",
+      "description": "G-address + MEMO_TEXT '0' valid canonical routing ID",
+      "input": {
+        "destination": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
+        "memoType": "text",
+        "memoValue": "0"
+      },
+      "expected": {
+        "destinationBaseAccount": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
+        "routingId": "0",
+        "routingSource": "memo",
+        "warnings": []
+      },
+      "tags": ["positive", "edge"]
+    },
+    {
+      "module": "extract_routing",
+      "description": "G-address + MEMO_TEXT '007' non-canonical leading zeros normalized",
+      "input": {
+        "destination": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
+        "memoType": "text",
+        "memoValue": "007"
+      },
+      "expected": {
+        "destinationBaseAccount": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
+        "routingId": "7",
+        "routingSource": "memo",
+        "warnings": [
+          {
+            "code": "NON_CANONICAL_ROUTING_ID",
+            "severity": "warn",
+            "message": "Memo routing ID had leading zeros. Normalized to canonical decimal.",
+            "normalization": {
+              "original": "007",
+              "normalized": "7"
+            }
+          }
+        ]
+      },
+      "tags": ["negative", "edge"]
+    },
+    {
+      "module": "extract_routing",
+      "description": "G-address + MEMO_TEXT '000' non-canonical leading zeros normalized to 0",
+      "input": {
+        "destination": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
+        "memoType": "text",
+        "memoValue": "000"
+      },
+      "expected": {
+        "destinationBaseAccount": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
+        "routingId": "0",
+        "routingSource": "memo",
+        "warnings": [
+          {
+            "code": "NON_CANONICAL_ROUTING_ID",
+            "severity": "warn",
+            "message": "Memo routing ID had leading zeros. Normalized to canonical decimal.",
+            "normalization": {
+              "original": "000",
+              "normalized": "0"
+            }
+          }
+        ]
+      },
+      "tags": ["negative", "edge"]
+    },
+    {
+      "module": "extract_routing",
       "description": "Memo ID leading zeros normalization",
       "input": {
         "destination": "GA7QYNF7SZFX4X7X5JFZZ3UQ6BXHDSY2RKVKZKX5FFQJ1ZMZX1",
