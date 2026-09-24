@@ -4,6 +4,8 @@
   "description": "Bluewhale – monorepo",
   "private": true,
   "scripts": {
+    "spec:validate": "node spec/validate.js",
+    "spec:sync-check": "node scripts/check-vectors-sync.js",
     "fuzz:differential": "node scripts/differential-fuzz.js"
   }
 }

@@ -23,7 +23,7 @@ The most impactful way to contribute is by adding new test vectors to `spec/vect
 2. If you've added code that should be tested, add tests.
 3. If you've changed APIs, update the documentation.
 4. Ensure the test suite passes (`pnpm test`, `go test ./...`, `dart test`).
-5. Use `pnpm changeset` to document your changes.
+5. Add an entry under `## [Unreleased]` in the `CHANGELOG.md` of every package you touched (see below).
 
 ### Development Setup
 
@@ -37,6 +37,31 @@ node spec/validate.js
 # Run tests across all packages
 pnpm test
 ```
+
+### Changelogs & release versioning
+
+Each SDK keeps a `CHANGELOG.md` in [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format:
+
+| Package | Changelog | Version source |
+|---------|-----------|----------------|
+| `@redishfish/bluewhale-core` | `packages/core-ts/CHANGELOG.md` | `packages/core-ts/package.json` |
+| `core-go` | `packages/core-go/CHANGELOG.md` | git tag `packages/core-go/vX.Y.Z` |
+| `bluewhale_core` (Dart) | `packages/core-dart/CHANGELOG.md` | `packages/core-dart/pubspec.yaml` |
+
+* Record changes under `## [Unreleased]` using the standard groups
+  (`Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`).
+* **Spec updates drive releases.** Any change to `spec/vectors.json` must bump
+  `spec_version` (enforced by `scripts/check-spec-version-bump.js`), and every
+  SDK is released in lockstep at that version:
+  1. Bump `spec_version` in `spec/vectors.json` and `packages/spec/vectors.json`.
+  2. Set the same version in `packages/spec/package.json`,
+     `packages/core-ts/package.json` and `packages/core-dart/pubspec.yaml`.
+  3. In each SDK changelog, move `[Unreleased]` entries into
+     `## [X.Y.Z] - YYYY-MM-DD` (noting "Implements spec `X.Y.Z`") and leave an
+     empty `## [Unreleased]` section at the top.
+  4. After merge, tag the Go module as `packages/core-go/vX.Y.Z`.
+* `pnpm spec:sync-check` (`scripts/check-vectors-sync.js`) verifies the
+  versions and changelog entries; it runs in CI and in `scripts/release.js`.
 
 ### Style Guide
 *   **TypeScript**: Follow the existing Prettier/ESLint config.

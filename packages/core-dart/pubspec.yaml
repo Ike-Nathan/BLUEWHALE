@@ -1,6 +1,6 @@
 name: bluewhale_core
 description: A robust Dart implementation of the Bluewhale, providing safe handling of G, M, and C addresses with cross-language specification compliance.
-version: 1.1.0
+version: 1.2.0
 repository: https://github.com/REDISHFISH/BLUEWHALE/tree/main/packages/core-dart
 
 environment:
