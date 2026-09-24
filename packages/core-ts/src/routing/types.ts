@@ -17,9 +17,11 @@ export type RoutingInput = {
 
 export type KnownMemoType = "none" | "id" | "text" | "hash" | "return";
 
+import { SafeRoutingId } from "./safeRoutingId";
+
 export type RoutingResult = {
   destinationBaseAccount: string | null;
-  routingId: string | bigint | null;
+  routingId: string | bigint | SafeRoutingId | null;
   routingSource: RoutingSource;
   warnings: Warning[]; // WarningCode only, always
   destinationError?: {
@@ -31,11 +33,16 @@ export type RoutingResult = {
 export type MemoRequirementFetcher = (baseAccount: string) => Promise<boolean>;
 
 export function routingIdAsBigInt(
-  routingId: string | bigint | null
+  routingId: string | bigint | SafeRoutingId | null
 ): bigint | null {
   if (routingId === null) {
     return null;
   }
 
+  if (routingId instanceof SafeRoutingId) {
+    return routingId.toBigInt();
+  }
+
   return typeof routingId === "bigint" ? routingId : BigInt(routingId);
 }
+export { SafeRoutingId };
