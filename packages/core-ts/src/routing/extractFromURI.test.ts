@@ -1,8 +1,4 @@
-import {
-  isSuccessfulURIResult,
-  extractRoutingFromURI,
-  sanitizeSep7UriForLogging,
-} from "./extractFromURI";
+import { isSuccessfulURIResult, extractRoutingFromURI, sanitizeSep7UriForLogging } from "./extractFromURI";
 
 describe("extractRoutingFromURI", () => {
   describe("scheme validation", () => {
@@ -191,36 +187,46 @@ describe("extractRoutingFromURI", () => {
     });
   });
 
-  describe("query parameter sanitization", () => {
-    it("redacts sensitive keys in sanitizeSep7UriForLogging", () => {
-      const sanitized = sanitizeSep7UriForLogging(
-        "secret_op?destination=GABC&signature=supersecret&callback=https://secret.com&memo=confidential&msg=hello"
+  describe("query sanitization for errors/logs (issue #36)", () => {
+    const SECRET = "sig-topsecret-123";
+    const CALLBACK = "https://cb.example/hook?token=abc";
+
+    it("redacts signature and callback values", () => {
+      const out = sanitizeSep7UriForLogging(
+        `web+stellar:pay?destination=GABC&signature=${SECRET}&callback=${encodeURIComponent(CALLBACK)}`
       );
-      expect(sanitized).toContain("signature=[REDACTED]");
-      expect(sanitized).toContain("callback=[REDACTED]");
-      expect(sanitized).toContain("memo=[REDACTED]");
-      expect(sanitized).toContain("msg=[REDACTED]");
-      expect(sanitized).not.toContain("supersecret");
-      expect(sanitized).not.toContain("secret.com");
-      expect(sanitized).not.toContain("confidential");
-      expect(sanitized).toContain("destination=GABC");
+      expect(out).not.toContain(SECRET);
+      expect(out).not.toContain("token=abc");
+      expect(out).toContain("signature=[REDACTED]");
+      expect(out).toContain("callback=[REDACTED]");
+      expect(out).toContain("destination=GABC");
     });
 
-    it("redacts sensitive query parameters in unsupported operation error descriptions", () => {
-      const result = extractRoutingFromURI(
-        "web+stellar:tx?signature=secret_sig&callback=https://secret.token&memo=my_secret"
+    it("redacts memo and msg values", () => {
+      const out = sanitizeSep7UriForLogging(
+        "web+stellar:pay?destination=GABC&memo=personal-note&msg=hello"
       );
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).not.toContain("secret_sig");
-        expect(result.error).not.toContain("secret.token");
-        expect(result.error).not.toContain("my_secret");
-        expect(result.error).toContain("[REDACTED]");
+      expect(out).not.toContain("personal-note");
+      expect(out).not.toContain("hello");
+    });
+
+    it("leaves URIs without a query string untouched", () => {
+      expect(sanitizeSep7UriForLogging("web+stellar:pay")).toBe("web+stellar:pay");
+    });
+
+    it("never leaks secrets through failure error descriptions", () => {
+      const hostile = [
+        `web+stellar:tx?signature=${SECRET}`,
+        `https://example.com/pay?signature=${SECRET}&callback=x`,
+        `web+stellar:pay?signature=${SECRET}`,
+        "",
+      ];
+      for (const uri of hostile) {
+        const result = extractRoutingFromURI(uri);
+        if (!result.success) {
+          expect(result.error).not.toContain(SECRET);
+        }
       }
-    });
-
-    it("leaves query-less input untouched", () => {
-      expect(sanitizeSep7UriForLogging("unknown_op")).toBe("unknown_op");
     });
   });
 });

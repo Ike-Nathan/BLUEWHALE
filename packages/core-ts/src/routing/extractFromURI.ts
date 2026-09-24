@@ -38,6 +38,42 @@ export type ExtractRoutingFromURIResult =
     };
 
 /**
+ * Query keys whose values must never appear in error messages or logs.
+ * SEP-0007 `signature`/`callback` can carry secrets; `memo`/`msg` can
+ * carry personal data.
+ */
+const SENSITIVE_QUERY_KEYS = new Set(["signature", "callback", "memo", "msg"]);
+
+const REDACTED = "[REDACTED]";
+
+/**
+ * Return a log-safe copy of a SEP-0007 URI with sensitive query values
+ * redacted. Unknown/unparseable input is returned unchanged when it holds
+ * no query string, otherwise with its values redacted.
+ *
+ * Use this whenever a URI (or a string derived from one) ends up in an
+ * error description or log line.
+ */
+export function sanitizeSep7UriForLogging(uriString: string): string {
+  const queryIndex = uriString.indexOf("?");
+  if (queryIndex === -1) return uriString;
+  const prefix = uriString.slice(0, queryIndex + 1);
+  const query = uriString.slice(queryIndex + 1);
+  const redacted = query
+    .split("&")
+    .map((pair) => {
+      const eq = pair.indexOf("=");
+      const key = eq === -1 ? pair : pair.slice(0, eq);
+      if (SENSITIVE_QUERY_KEYS.has(key.toLowerCase())) {
+        return `${key}=${REDACTED}`;
+      }
+      return pair;
+    })
+    .join("&");
+  return prefix + redacted;
+}
+
+/**
  * Map SEP-0007 memo_type values to internal KnownMemoType.
  */
 function mapMemoType(sep7MemoType: string | undefined): RoutingInput["memoType"] {
@@ -138,12 +174,14 @@ export function extractRoutingFromURI(uriString: string): ExtractRoutingFromURIR
     ? withoutScheme.split("?", 2)
     : [withoutScheme, ""];
 
-  // 3. Only 'pay' operation is supported for routing extraction
+  // 3. Only 'pay' operation is supported for routing extraction.
+  // The operation is URI-derived text, so it passes through the query
+  // sanitizer before reaching the error description.
   if (operation !== "pay") {
     const sanitizedOp = sanitizeSep7UriForLogging(operation);
     return {
       success: false,
-      error: `Unsupported operation: '${sanitizedOp}'. Only 'pay' is supported for routing extraction.`,
+      error: `Unsupported operation: '${sanitizeSep7UriForLogging(operation)}'. Only 'pay' is supported for routing extraction.`,
       code: "UNSUPPORTED_OPERATION",
     };
   }

@@ -39,6 +39,11 @@ export function normalizeMemoTextId(s: string): NormalizeResult {
     });
   }
 
+  // Validate that normalized contains only decimal digits before BigInt conversion
+  if (!/^\d+$/.test(normalized)) {
+    return { normalized: null, warnings };
+  }
+
   try {
     const val = BigInt(normalized);
     if (val > UINT64_MAX) {
