@@ -28,6 +28,7 @@ RoutingResult extractRouting(RoutingInput input)
 | `address` | `string` | The destination address (G, M, or C). |
 | `memoType` | `string` | (Optional) `ID`, `TEXT`, `HASH`, or `RETURN`. |
 | `memoValue` | `string` | (Optional) The raw memo value. |
+| `minSeverityLevel` | `string` | (Optional) Filter warnings by minimum severity. See below. |
 
 ## Output: `RoutingResult`
 
@@ -35,5 +36,68 @@ RoutingResult extractRouting(RoutingInput input)
 |---|---|---|
 | `address` | `string` | The canonical base G-address. |
 | `routingId` | `string` | The extracted 64-bit ID (or empty string). |
-| `warnings` | `Warning[]` | List of warnings encountered. |
+| `warnings` | `Warning[]` | List of warnings encountered (filtered by `minSeverityLevel` if provided). |
 | `destinationError` | `string` | Error code if the destination is invalid. |
+
+## Option: `minSeverityLevel`
+
+The `minSeverityLevel` option was added in **v1.1.0** to let integrators suppress low-priority warnings that are not actionable in their environment. When set, the returned `warnings` array will only include warnings whose `severity` is greater than or equal to the specified level.
+
+### Severity Hierarchy
+
+```
+INFO  <  WARN  <  ERROR
+```
+
+### Values
+
+| Value | Warnings returned |
+|---|---|
+| `"INFO"` (default) | All warnings (`INFO`, `WARN`, `ERROR`). |
+| `"WARN"` | Only `WARN` and `ERROR` warnings. |
+| `"ERROR"` | Only `ERROR` warnings. |
+
+### Example
+
+```typescript
+import { extractRouting } from '@redishfish/bluewhale-core';
+
+// Suppress INFO-level warnings in production to reduce noise
+const result = extractRouting({
+  address: "MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBAAAAAAAAAAAAABQD",
+  memoType: "ID",
+  memoValue: "123",
+  minSeverityLevel: "WARN",
+});
+
+// REDUNDANT_MEMO (INFO) is suppressed; only WARN and ERROR warnings appear
+console.log(result.warnings); // []
+```
+
+<Info>
+  `minSeverityLevel` filters the **returned** warnings only. All warnings are still evaluated internally, so setting this option does not change the routing result — it only affects what is surfaced to your application code.
+</Info>
+
+### Go and Dart
+
+The option is available in the same position in all three implementations:
+
+<CodeGroup>
+```go Go
+result := routing.ExtractRouting(routing.RoutingInput{
+    Address:          "MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBAAAAAAAAAAAAABQD",
+    MemoType:         "ID",
+    MemoValue:        "123",
+    MinSeverityLevel: "WARN",
+})
+```
+
+```dart Dart
+final result = extractRouting(RoutingInput(
+  address: "MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBAAAAAAAAAAAAABQD",
+  memoType: "ID",
+  memoValue: "123",
+  minSeverityLevel: "WARN",
+));
+```
+</CodeGroup>
