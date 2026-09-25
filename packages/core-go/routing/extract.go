@@ -44,8 +44,14 @@ func normalizeUnsupportedMemoType(memoType string) string {
 // ExtractRouting identifies the deposit routing destination and identifier from a Stellar
 // payment input. It implements the standard priority policy where M-address identifiers
 // take precedence over any provided memo. Returns a RoutingResult with the decoded
-// state and applicable warnings.
+// state and applicable warnings, filtered by input.MinSeverityLevel.
 func ExtractRouting(input RoutingInput) RoutingResult {
+	result := extractRouting(input)
+	result.Warnings = FilterBySeverity(result.Warnings, input.MinSeverityLevel)
+	return result
+}
+
+func extractRouting(input RoutingInput) RoutingResult {
 	if input.SourceAccount != "" {
 		source, err := address.Parse(input.SourceAccount)
 		if err == nil && source.Kind == address.KindC {
@@ -211,22 +217,16 @@ func ExtractRouting(input RoutingInput) RoutingResult {
 // cancellation and deadline propagation.
 type MemoRequirementFetcher func(baseAccount string) (bool, error)
 
-// ContextMemoRequirementFetcher is the context-aware variant of
-// [MemoRequirementFetcher]. It receives a [context.Context] so that the
-// underlying HTTP call (Horizon, Federation server, or an indexer) can be
-// cancelled or timed out by the caller.
-type ContextMemoRequirementFetcher func(ctx context.Context, baseAccount string) (bool, error)
-
-// ExtractRoutingWithContext performs routing extraction and optionally adds the
-// SEP-0029 error when a classic destination requires a memo but no routing ID
-// was supplied.
+// ExtractRoutingWithMemoRequirement performs normal routing extraction and
+// optionally adds the SEP-0029 error when a classic destination requires a
+// memo but no routing ID was supplied. Fetch failures fail open so callers
+// retain the result of the synchronous parser.
 //
-// The supplied [context.Context] is forwarded to [ContextMemoRequirementFetcher]
-// intact, which allows the caller to cancel in-flight requests or enforce a
-// per-request deadline. Fetch failures — including [context.Canceled] and
-// [context.DeadlineExceeded] — fail open so the synchronous parser result is
-// always returned.
-func ExtractRoutingWithContext(ctx context.Context, input RoutingInput, fetch ContextMemoRequirementFetcher) RoutingResult {
+// The ctx parameter is accepted for API consistency with context-aware
+// call chains (e.g. future fetcher implementations backed by Horizon or an
+// indexer); the current implementation performs no cancellable work and
+// does not use it.
+func ExtractRoutingWithMemoRequirement(ctx context.Context, input RoutingInput, fetch MemoRequirementFetcher) RoutingResult {
 	result := ExtractRouting(input)
 	if fetch == nil || result.DestinationBaseAccount == "" || result.RoutingID != nil || result.DestinationError != nil {
 		return result
