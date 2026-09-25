@@ -1,59 +1,46 @@
 package address
 
-import (
-"encoding/binary"
-"errors"
-"strings"
-)
+import "encoding/binary"
 
 // Parse parses a Stellar address string into an Address struct.
+//
+// The address is decoded exactly once. For M-addresses the base G-address
+// and muxed ID are derived from that single decode.
 func Parse(input string) (*Address, error) {
-kind, err := Detect(input)
-if err != nil {
-var code ErrorCode = ErrUnknownPrefix
+	versionByte, payload, raw, err := decodeStrKey(input)
+	if err != nil {
+		code := ErrUnknownPrefix
+		if re, ok := err.(RoutingError); ok {
+			code = re.Code
+		}
+		return nil, RoutingError{
+			Code:    code,
+			Input:   input,
+			Message: err.Error(),
+		}
+	}
 
-switch {
-case errors.Is(err, ErrInvalidChecksumError):
-code = ErrInvalidChecksum
-case errors.Is(err, ErrInvalidBase32Error):
-code = ErrInvalidBase32
-case errors.Is(err, ErrInvalidLengthError):
-code = ErrInvalidLength
-}
+	kind, err := kindForVersionByte(versionByte)
+	if err != nil {
+		return nil, err
+	}
 
-return nil, RoutingError{
-Code:    code,
-Input:   input,
-Message: err.Error(),
-}
-}
+	addr := &Address{
+		Kind: kind,
+		Raw:  raw,
+	}
 
-raw := strings.ToUpper(input)
-addr := &Address{
-Kind: kind,
-Raw:  raw,
-}
+	if kind == KindM {
+		if len(payload) != 40 {
+			return nil, errInvalidLength
+		}
+		baseG, err := EncodeStrKey(VersionByteG, payload[:32])
+		if err != nil {
+			return nil, err
+		}
+		addr.BaseG = baseG
+		addr.MuxedID = binary.BigEndian.Uint64(payload[32:40])
+	}
 
-if kind == KindM {
-versionByte, payload, err := DecodeStrKey(raw)
-if err != nil {
-return nil, err
-}
-if versionByte != VersionByteM {
-return nil, ErrUnknownPrefixError
-}
-if len(payload) != 40 {
-return nil, ErrInvalidLengthError
-}
-pubkey := payload[:32]
-id := binary.BigEndian.Uint64(payload[32:40])
-baseG, err := EncodeStrKey(VersionByteG, pubkey)
-if err != nil {
-return nil, err
-}
-addr.BaseG = baseG
-addr.MuxedID = id
-}
-
-return addr, nil
+	return addr, nil
 }

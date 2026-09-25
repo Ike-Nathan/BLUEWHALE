@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/address"
-	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/muxed"
 )
 
 // normalizeUnsupportedMemoType canonicalizes a memo type string by lower-casing it
@@ -86,17 +85,9 @@ func ExtractRouting(input RoutingInput) RoutingResult {
 	}
 
 	if parsed.Kind == address.KindM {
-		baseG, id, err := muxed.DecodeMuxed(parsed.Raw)
-		if err != nil {
-			return RoutingResult{
-				RoutingSource: "none",
-				Warnings:      []address.Warning{},
-				DestinationError: &DestinationError{
-					Code:    address.ErrUnknownPrefix,
-					Message: err.Error(),
-				},
-			}
-		}
+		// address.Parse already decoded the muxed payload; reuse it rather
+		// than decoding the M-address a second time.
+		baseG, id := parsed.BaseG, parsed.MuxedID
 
 		// Pre-allocate with capacity for existing warnings plus at most one more.
 		warnings := make([]address.Warning, 0, len(parsed.Warnings)+1)
