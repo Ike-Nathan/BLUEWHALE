@@ -20,6 +20,18 @@ This starts the listener along with a Prometheus instance to visualize metrics.
 docker compose up
 ```
 
+Once started, verify that the healthcheck passes:
+```bash
+docker compose ps
+# The listener service should show "healthy" under the STATUS column.
+```
+
+You can also hit the endpoint directly:
+```bash
+curl http://localhost:9090/healthz
+# {"status":"ok","time":"2024-01-01T00:00:00Z"}
+```
+
 ### Option B: Running Locally
 1.  Navigate to the directory:
     ```bash
@@ -57,7 +69,7 @@ Occurs when the payment cannot be safely credited to a user.
 This implementation explicitly uses `listener.ExtractRouting` (found in `internal/listener/router.go`) to process every payment. It demonstrates:
 - **Graceful Shutdown**: Uses context-based cancellation for SIGINT/SIGTERM.
 - **Resilience**: Implements exponential backoff for Horizon connection failures.
-- **Observability**: Exports Prometheus metrics for payment success/failure rates.
+- **Observability**: Exports Prometheus metrics at `/metrics` and a liveness healthcheck at `/healthz` (port `metrics.port`).
 - **Safety**: Never panics on malformed transaction data; instead, it logs an `alert=true` event for manual review.
 
 ## Link to Core Library

@@ -9,6 +9,7 @@ import (
 
 	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/address"
 	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/muxed"
+	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/routing"
 )
 
 type VectorCase struct {
@@ -148,7 +149,58 @@ func TestVectors(t *testing.T) {
 						t.Errorf("expected error or empty kind for invalid address")
 					}
 				}
+
+			case "extract_routing":
+				// Only vectors that exercise the source-account policy are run
+				// here; the remaining extract_routing vectors use legacy
+				// placeholder addresses that Go rejects at checksum validation.
+				source, _ := tc.Input["sourceAccount"].(string)
+				if source == "" {
+					t.Skip("extract_routing vector without sourceAccount")
+				}
+				memoValue, _ := tc.Input["memoValue"].(string)
+				res := routing.ExtractRouting(routing.RoutingInput{
+					Destination:   tc.Input["destination"].(string),
+					MemoType:      tc.Input["memoType"].(string),
+					MemoValue:     memoValue,
+					SourceAccount: source,
+				})
+				assertRoutingVector(t, tc.Expected, res)
 			}
 		})
+	}
+}
+
+func assertRoutingVector(t *testing.T, expected map[string]interface{}, res routing.RoutingResult) {
+	t.Helper()
+
+	wantBase, _ := expected["destinationBaseAccount"].(string)
+	if res.DestinationBaseAccount != wantBase {
+		t.Errorf("destinationBaseAccount = %q, want %q", res.DestinationBaseAccount, wantBase)
+	}
+
+	wantID, _ := expected["routingId"].(string)
+	gotID := ""
+	if res.RoutingID != nil {
+		gotID = res.RoutingID.String()
+	}
+	if gotID != wantID {
+		t.Errorf("routingId = %q, want %q", gotID, wantID)
+	}
+
+	if res.RoutingSource != expected["routingSource"] {
+		t.Errorf("routingSource = %q, want %v", res.RoutingSource, expected["routingSource"])
+	}
+
+	wantWarnings, _ := expected["warnings"].([]interface{})
+	if len(res.Warnings) != len(wantWarnings) {
+		t.Fatalf("warnings = %+v, want %v", res.Warnings, wantWarnings)
+	}
+	for i, raw := range wantWarnings {
+		w := raw.(map[string]interface{})
+		got := res.Warnings[i]
+		if string(got.Code) != w["code"] || got.Severity != w["severity"] || got.Message != w["message"] {
+			t.Errorf("warnings[%d] = %+v, want %v", i, got, w)
+		}
 	}
 }

@@ -28,6 +28,7 @@ type Warning =
   | { code: 'JS_PRECISION_LOSS'; severity: 'ERROR'; message: string }
   | { code: 'REDUNDANT_MEMO'; severity: 'INFO'; message: string }
   | { code: 'MEMO_TYPE_MISMATCH'; severity: 'WARN'; message: string }
+  | { code: 'MISSING_REQUIRED_MEMO'; severity: 'WARN'; message: string }
   // ... and others
 ```
 
@@ -36,3 +37,69 @@ type Warning =
 <Info>
   **The Invariant**: If `destinationError` is present, all other fields (`address`, `routingId`, `warnings`) will be null, none, or empty.
 </Info>
+
+## MISSING_REQUIRED_MEMO and SEP-0029
+
+### What is MISSING_REQUIRED_MEMO?
+
+The `MISSING_REQUIRED_MEMO` warning is emitted when a payment is directed at a G-address that requires a memo (according to [SEP-0029](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0029.md)), but no memo was provided in the transaction.
+
+SEP-0029 defines an on-chain flag — the `config.memo_required` data entry on an account — that signals to sending wallets and exchanges that a memo **must** be present for the deposit to be credited. Bluewhale surfaces this as a warning rather than an error because the library performs pure address/memo analysis and does not query the network; however, integrators should treat it as an actionable signal.
+
+### Why It Matters for Exchanges
+
+Exchanges operating pooled accounts (a single G-address shared by many users, distinguished by memo) depend on the memo to identify which user should receive credit. A deposit without a memo has an **unknown beneficiary** — it cannot be automatically credited and must be handled manually.
+
+The typical exchange workflow when `MISSING_REQUIRED_MEMO` is encountered:
+
+1. **Do not auto-credit** the deposit to any user balance.
+2. **Quarantine the funds** in a suspense or holding account.
+3. **Contact the sender** through your support channel and ask them to provide the memo that should have accompanied the payment.
+4. **Apply the credit manually** once the sender confirms their account identifier.
+
+<Warning>
+  Automatically crediting a deposit with no memo to a "default" account is a common source of lost funds. Always quarantine memo-less deposits to pooled accounts.
+</Warning>
+
+### SEP-0029 Async Check
+
+The `MISSING_REQUIRED_MEMO` warning is emitted synchronously by `extractRouting` based on the inputs you provide. However, determining whether a specific G-address actually **requires** a memo (i.e., whether the account has set the SEP-0029 flag) requires an asynchronous network call to Horizon.
+
+The recommended integration pattern is a two-phase check:
+
+```typescript
+import { extractRouting } from '@redishfish/bluewhale-core';
+
+// Phase 1 — synchronous: analyse the memo that arrived with the payment
+const result = extractRouting({
+  address: "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHB",
+  memoType: undefined,
+  memoValue: undefined,
+});
+
+// Phase 2 — async: verify SEP-0029 flag on Horizon (pseudo-code)
+if (result.routingId === "") {
+  const accountData = await horizon.loadAccount(result.address);
+  const memoRequired = accountData.data_attr["config.memo_required"] === "MQ=="; // base64("1")
+
+  if (memoRequired) {
+    // The account requires a memo but none was provided.
+    // Quarantine this deposit — do NOT credit any user.
+    await quarantineDeposit(payment, "MISSING_REQUIRED_MEMO");
+  }
+}
+```
+
+<Info>
+  The base64 value `"MQ=="` decodes to `"1"` and is the canonical SEP-0029 signal that the account requires a memo. Any other value (or absence of the key) means the account does not enforce the requirement.
+</Info>
+
+### Warning Code Reference
+
+| Code | Severity | Trigger | Recommended Action |
+|---|---|---|---|
+| `MISSING_REQUIRED_MEMO` | `WARN` | G-address payment with no memo, where the account is known to require one. | Quarantine deposit; contact sender for memo. |
+| `MEMO_TYPE_MISMATCH` | `WARN` | Numeric string sent as `MEMO_TEXT` instead of `MEMO_ID`. | Accept with caution; log the discrepancy. |
+| `NON_ROUTABLE_MEMO` | `WARN` | Non-numeric `MEMO_TEXT`, `MEMO_HASH`, or `MEMO_RETURN`. | Cannot route; treat as memo-less deposit. |
+| `REDUNDANT_MEMO` | `INFO` | External memo present alongside an M-address. | Ignore the external memo; use the M-address ID. |
+| `JS_PRECISION_LOSS` | `ERROR` | Routing ID exceeds JavaScript's safe integer range. | Reject; use BigInt-safe handling or the Go/Dart implementation. |

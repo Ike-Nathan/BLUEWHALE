@@ -1,6 +1,7 @@
 package routing
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
@@ -43,8 +44,14 @@ func normalizeUnsupportedMemoType(memoType string) string {
 // ExtractRouting identifies the deposit routing destination and identifier from a Stellar
 // payment input. It implements the standard priority policy where M-address identifiers
 // take precedence over any provided memo. Returns a RoutingResult with the decoded
-// state and applicable warnings.
+// state and applicable warnings, filtered by input.MinSeverityLevel.
 func ExtractRouting(input RoutingInput) RoutingResult {
+	result := extractRouting(input)
+	result.Warnings = FilterBySeverity(result.Warnings, input.MinSeverityLevel)
+	return result
+}
+
+func extractRouting(input RoutingInput) RoutingResult {
 	if input.SourceAccount != "" {
 		source, err := address.Parse(input.SourceAccount)
 		if err == nil && source.Kind == address.KindC {
@@ -204,18 +211,27 @@ func ExtractRouting(input RoutingInput) RoutingResult {
 
 // MemoRequirementFetcher retrieves whether a destination account requires a
 // routing memo. Implementations can use Horizon, an indexer, or a cached source.
+//
+// Deprecated: Use [ContextMemoRequirementFetcher] and
+// [ExtractRoutingWithContext] instead, which accept a [context.Context] for
+// cancellation and deadline propagation.
 type MemoRequirementFetcher func(baseAccount string) (bool, error)
 
 // ExtractRoutingWithMemoRequirement performs normal routing extraction and
 // optionally adds the SEP-0029 error when a classic destination requires a
 // memo but no routing ID was supplied. Fetch failures fail open so callers
 // retain the result of the synchronous parser.
-func ExtractRoutingWithMemoRequirement(input RoutingInput, fetch MemoRequirementFetcher) RoutingResult {
+//
+// The ctx parameter is accepted for API consistency with context-aware
+// call chains (e.g. future fetcher implementations backed by Horizon or an
+// indexer); the current implementation performs no cancellable work and
+// does not use it.
+func ExtractRoutingWithMemoRequirement(ctx context.Context, input RoutingInput, fetch MemoRequirementFetcher) RoutingResult {
 	result := ExtractRouting(input)
 	if fetch == nil || result.DestinationBaseAccount == "" || result.RoutingID != nil || result.DestinationError != nil {
 		return result
 	}
-	required, err := fetch(result.DestinationBaseAccount)
+	required, err := fetch(ctx, result.DestinationBaseAccount)
 	if err == nil && required {
 		result.Warnings = append(result.Warnings, address.Warning{
 			Code:     address.WarnMissingRequiredMemo,
@@ -224,6 +240,26 @@ func ExtractRoutingWithMemoRequirement(input RoutingInput, fetch MemoRequirement
 		})
 	}
 	return result
+}
+
+// ExtractRoutingWithMemoRequirement performs normal routing extraction and
+// optionally adds the SEP-0029 error when a classic destination requires a
+// memo but no routing ID was supplied. Fetch failures fail open so callers
+// retain the result of the synchronous parser.
+//
+// Deprecated: Use [ExtractRoutingWithContext] with a [ContextMemoRequirementFetcher]
+// to enable request cancellation and deadline propagation.
+func ExtractRoutingWithMemoRequirement(input RoutingInput, fetch MemoRequirementFetcher) RoutingResult {
+	if fetch == nil {
+		return ExtractRoutingWithContext(context.Background(), input, nil)
+	}
+	// Wrap the legacy fetcher so it satisfies ContextMemoRequirementFetcher.
+	// The context is intentionally not forwarded to the wrapped function
+	// (it has no context parameter), but callers can migrate to
+	// ExtractRoutingWithContext when they are ready.
+	return ExtractRoutingWithContext(context.Background(), input, func(_ context.Context, baseAccount string) (bool, error) {
+		return fetch(baseAccount)
+	})
 }
 
 func stringValue(s string) string {
