@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback, CSSProperties } from 'react';
 import { TypeBadge, AddressType } from './components/TypeBadge';
-import { WarningList } from './components/WarningList';
+import { WarningList, WarningItem } from './components/WarningList';
 import { MemoField } from './components/MemoField';
 
 /**
@@ -201,6 +201,51 @@ export const AddressInput: React.FC<AddressInputProps> = ({
 }) => {
   const [address, setAddress] = useState('');
   const [memo, setMemo] = useState('');
+  // Set when the current address/memo came from a decoded SEP-0007 URI.
+  const [decodedFromURI, setDecodedFromURI] = useState(false);
+  const [uriWarnings, setUriWarnings] = useState<WarningItem[]>(EMPTY_WARNINGS);
+
+  /**
+   * Handle raw input. A pasted/scanned `web+stellar:pay?...` URI is parsed
+   * with extractRoutingFromURI and its destination and memo populate the
+   * fields; anything else is taken as a plain address.
+   */
+  const handleInput = (raw: string) => {
+    if (!isSep7URI(raw)) {
+      setAddress(raw);
+      setDecodedFromURI(false);
+      setUriWarnings(EMPTY_WARNINGS);
+      return;
+    }
+
+    const trimmed = raw.trim();
+    // The core parser matches the scheme case-sensitively; normalize it.
+    const result = extractRoutingFromURI(SEP7_SCHEME + trimmed.slice(SEP7_SCHEME.length));
+    if (result.success) {
+      setAddress(result.rawParams.destination);
+      setMemo(result.rawParams.memo ?? '');
+      setDecodedFromURI(true);
+      setUriWarnings(result.routing.warnings);
+    } else {
+      // Error text from core is already sanitized of sensitive query values.
+      setAddress(trimmed);
+      setDecodedFromURI(false);
+      setUriWarnings([{ code: result.code, message: `Could not decode Stellar URI: ${result.error}`, severity: 'error' }]);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData('text');
+    if (isSep7URI(pasted)) {
+      e.preventDefault();
+      handleInput(pasted);
+    }
+  };
+
+  const baseId = useStableId('bluewhale-address');
+  const inputId = `${baseId}-input`;
+  const warningsId = `${baseId}-warnings`;
+  const statusId = `${baseId}-status`;
 
   const type = useMemo<AddressType>(() => {
     if (!address) return 'UNKNOWN';
@@ -214,7 +259,7 @@ export const AddressInput: React.FC<AddressInputProps> = ({
   const showMemo = type === 'G' || type === 'UNKNOWN';
 
   const warnings = useMemo(() => {
-    const list: string[] = [];
+    const list: WarningItem[] = [];
     if (type === 'C') {
       list.push('Contract addresses cannot be used for standard payments.');
     }
@@ -261,6 +306,7 @@ export const AddressInput: React.FC<AddressInputProps> = ({
           </div>
         )}
         <input
+          id={inputId}
           type="text"
           placeholder="Paste Stellar address (G..., M..., C...)"
           value={address}
