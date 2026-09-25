@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 
 export type AddressType = 'G' | 'M' | 'C' | 'UNKNOWN';
 
 interface TypeBadgeProps {
   type: AddressType;
+  /** Additional CSS class names merged onto the root element. */
+  className?: string;
+  /** Inline styles applied to the root element. */
+  style?: CSSProperties;
 }
 
-export const TypeBadge: React.FC<TypeBadgeProps> = ({ type }) => {
+export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, className, style }) => {
   if (type === 'UNKNOWN') return null;
 
   let backgroundColor = '#e2e8f0'; // default gray
@@ -27,8 +31,13 @@ export const TypeBadge: React.FC<TypeBadgeProps> = ({ type }) => {
       break;
   }
 
+  const rootClass = ['bw-type-badge', `bw-type-badge--${type.toLowerCase()}`, className]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <div
+      className={rootClass}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -41,7 +50,8 @@ export const TypeBadge: React.FC<TypeBadgeProps> = ({ type }) => {
         fontSize: '0.875rem',
         marginRight: '0.5rem',
         minWidth: '2rem',
-        userSelect: 'none'
+        userSelect: 'none',
+        ...style,
       }}
       title={`${type}-address`}
     >

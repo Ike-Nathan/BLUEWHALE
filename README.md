@@ -38,8 +38,13 @@ For full technical specifications, architecture deep-dives, and API references, 
 | Platform           | Package               | Install                                                              |
 | ------------------ | --------------------- | -------------------------------------------------------------------- |
 | **TypeScript**     | `@redishfish/bluewhale-core` | `npm install @redishfish/bluewhale-core`                                    |
+| **React UI**       | `@redishfish/bluewhale` | `npm install @redishfish/bluewhale`                                  |
 | **Go**             | `core-go`             | `go get github.com/REDISHFISH/BLUEWHALE/packages/core-go` |
 | **Dart / Flutter** | `bluewhale_core` | `dart pub add bluewhale_core`                                   |
+
+### UI Component Styling
+
+The `@redishfish/bluewhale` React package exposes stable BEM class names (e.g. `bw-address-input`, `bw-type-badge`, `bw-warning-item`) so you can override styles with plain CSS, Tailwind, or any CSS-in-JS solution. Every component also accepts `className` and `style` props for direct overrides. See the [packages/bluewhale README](packages/bluewhale/README.md) for the full class reference and dark mode example.
 
 ## Quick Example
 
