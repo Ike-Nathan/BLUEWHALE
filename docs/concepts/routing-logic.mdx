@@ -6,6 +6,52 @@ icon: "diagram-project"
 
 The library follows a strict set of rules to determine the `address` and `routingId` for any given input.
 
+## Deposit Routing Flow
+
+The diagram below illustrates the full decision tree — from payment arrival through address type detection, memo validation, and warning evaluation — ending in the exchange action recommended for each outcome.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant P as Payment
+    participant L as Bluewhale Library
+    participant E as Exchange System
+
+    P->>L: extractRouting({ address, memoType, memoValue })
+
+    alt C-address (Contract)
+        L-->>E: destinationError: INVALID_DESTINATION
+        E->>E: ❌ Reject — refund sender
+    else M-address (Muxed)
+        L->>L: Decode base G-address + routing ID
+        alt External memo also present
+            L-->>E: routingId (from M-address), warning: REDUNDANT_MEMO (INFO)
+            E->>E: ✅ Credit user — ignore external memo
+        else No external memo
+            L-->>E: address + routingId (no warnings)
+            E->>E: ✅ Credit user matching routingId
+        end
+    else G-address
+        alt MEMO_ID present
+            L-->>E: address + routingId
+            E->>E: ✅ Credit user matching routingId
+        else MEMO_TEXT — numeric value
+            L-->>E: address + routingId, warning: MEMO_TYPE_MISMATCH (WARN)
+            E->>E: ⚠️ Credit with caution — log discrepancy
+        else MEMO_TEXT — non-numeric value
+            L-->>E: address, routingId: "", warning: NON_ROUTABLE_MEMO (WARN)
+            E->>E: 🔶 Quarantine — cannot identify beneficiary
+        else MEMO_HASH or MEMO_RETURN
+            L-->>E: address, routingId: "", warning: NON_ROUTABLE_MEMO (WARN)
+            E->>E: 🔶 Quarantine — cannot identify beneficiary
+        else No memo
+            L-->>E: address, routingId: ""
+            note over L,E: SEP-0029 async check required
+            E->>E: 🔶 Quarantine — contact sender for memo
+        end
+    end
+```
+
 ## Routing Scenarios
 
 <AccordionGroup>
@@ -56,3 +102,15 @@ The library follows a strict set of rules to determine the `address` and `routin
     - `destinationError`: `INVALID_DESTINATION`.
   </Accordion>
 </AccordionGroup>
+
+## Recommended Exchange Actions by Warning Code
+
+| Warning Code | Severity | Recommended Action |
+|---|---|---|
+| _(no warning)_ | — | ✅ Auto-credit the matching user account. |
+| `REDUNDANT_MEMO` | `INFO` | ✅ Auto-credit using the M-address routing ID; discard the external memo. |
+| `MEMO_TYPE_MISMATCH` | `WARN` | ⚠️ Credit with caution — log the mismatch; alert your monitoring system. |
+| `NON_ROUTABLE_MEMO` | `WARN` | 🔶 Quarantine — memo cannot be mapped to a routing ID; contact sender. |
+| `MISSING_REQUIRED_MEMO` | `WARN` | 🔶 Quarantine — beneficiary unknown; contact sender for the missing memo. |
+| `JS_PRECISION_LOSS` | `ERROR` | ❌ Reject — routing ID exceeds JavaScript safe integer range; use BigInt-safe handling. |
+| `INVALID_DESTINATION` | _(error)_ | ❌ Reject — destination is a contract address or malformed; refund or discard. |

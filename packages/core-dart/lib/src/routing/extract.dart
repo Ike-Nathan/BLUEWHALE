@@ -4,6 +4,7 @@ import '../muxed/decode.dart';
 import 'routing_result.dart';
 import 'memo.dart';
 import 'safe_routing_id.dart';
+import 'severity.dart';
 
 /// Extracts deposit routing information from a Stellar payment input.
 /// Following the standard priority policy, M-address identifiers take
@@ -20,36 +21,21 @@ import 'safe_routing_id.dart';
 /// For future compatibility with async network checks (Federation, SEP-0029),
 /// use [extractRouting] instead.
 ///
-/// Contract (C) destinations do not throw: they return a [RoutingResult]
-/// with [RoutingSource.none] and a [RoutingWarning.invalidDestination]
-/// warning. Warnings below [RoutingInput.minSeverityLevel] are omitted.
+/// Warnings below [RoutingInput.minSeverityLevel] are filtered out using the
+/// shared severity ordering (info = 0, warn = 1, error = 2).
 RoutingResult extractRoutingSync(RoutingInput input) {
-  return _filterBySeverity(_extractRoutingSync(input), input.minSeverityLevel);
-}
-
-/// Returns [result] with warnings below [minSeverity] removed.
-///
-/// Warnings with an unrecognized severity string are always kept.
-RoutingResult _filterBySeverity(
-  RoutingResult result,
-  WarningSeverity? minSeverity,
-) {
-  if (minSeverity == null || minSeverity == WarningSeverity.info) {
-    return result;
-  }
+  final result = _extractRoutingUnfiltered(input);
+  if (severityWeight(input.minSeverityLevel) == 0) return result;
   return RoutingResult(
     source: result.source,
     id: result.id,
     destinationBaseAccount: result.destinationBaseAccount,
     destinationError: result.destinationError,
-    warnings: result.warnings.where((w) {
-      final level = w.severityLevel;
-      return level == null || level.index >= minSeverity.index;
-    }).toList(),
+    warnings: filterBySeverity(result.warnings, input.minSeverityLevel),
   );
 }
 
-RoutingResult _extractRoutingSync(RoutingInput input) {
+RoutingResult _extractRoutingUnfiltered(RoutingInput input) {
   final trimmed = input.destination.trim();
   if (trimmed.isEmpty) {
     throw const ExtractRoutingException('Invalid input: destination must be a non-empty string.');

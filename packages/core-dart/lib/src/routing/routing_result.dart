@@ -80,7 +80,7 @@ class RoutingWarning {
 
   /// Emitted when the transaction sender is detected as a smart contract.
   static const contractSender = RoutingWarning(
-    code: 'contract-sender',
+    code: 'CONTRACT_SENDER_DETECTED',
     severity: 'info',
     message: 'Contract source detected. Routing state cleared.',
   );
@@ -154,12 +154,9 @@ class RoutingInput {
   /// The source account address of the transaction.
   final String? sourceAccount;
 
-  /// The minimum severity a warning must have to be included in the result.
-  ///
-  /// Defaults to `null`, which is equivalent to [WarningSeverity.info] and
-  /// returns all warnings. Set to [WarningSeverity.warn] to drop
-  /// informational warnings, or [WarningSeverity.error] to keep only errors.
-  final WarningSeverity? minSeverityLevel;
+  /// Minimum severity (`info`, `warn` or `error`) of warnings to include in
+  /// the result. Defaults to `info` (all warnings are returned).
+  final String? minSeverityLevel;
 
   RoutingInput({
     required this.destination,
