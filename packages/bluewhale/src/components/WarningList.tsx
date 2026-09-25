@@ -1,73 +1,48 @@
-import React from 'react';
-import { WarningBadge, WARNING_STYLES, isHighRiskWarningCode } from './TypeBadge';
-
-/** Structured warning, compatible with the Warning objects from @redishfish/bluewhale-core. */
-export interface BluewhaleWarning {
-  code?: string;
-  message?: string;
-  severity?: 'info' | 'warn' | 'error';
-}
-
-export type WarningItem = string | BluewhaleWarning;
+import React, { CSSProperties } from 'react';
 
 interface WarningListProps {
-  warnings: WarningItem[];
-  /** DOM id so inputs can reference this list via aria-describedby. */
-  id?: string;
+  warnings: string[];
+  /** Additional CSS class names merged onto the root element. */
+  className?: string;
+  /** Inline styles applied to the root element. */
+  style?: CSSProperties;
 }
 
-const normalize = (warning: WarningItem): BluewhaleWarning =>
-  typeof warning === 'string' ? { message: warning } : warning;
-
-export const WarningList: React.FC<WarningListProps> = ({ warnings, id }) => {
+export const WarningList: React.FC<WarningListProps> = ({ warnings, className, style }) => {
   if (!warnings || warnings.length === 0) return null;
 
-  const items = warnings.map(normalize);
-  // Escalate the container to red if a contract sender is involved.
-  const hasContractSender = items.some((w) => w.code === 'CONTRACT_SENDER_DETECTED');
-  const containerStyle = hasContractSender
-    ? WARNING_STYLES.CONTRACT_SENDER_DETECTED
-    : { backgroundColor: '#fffbeb', borderColor: '#fde68a', color: '#92400e' };
+  const rootClass = ['bw-warning-list', className].filter(Boolean).join(' ');
 
   return (
     <div
-      id={id}
-      role="alert"
+      className={rootClass}
       style={{
         marginTop: '0.5rem',
         padding: '0.75rem',
         backgroundColor: containerStyle.backgroundColor,
         border: `1px solid ${containerStyle.borderColor}`,
         borderRadius: '0.375rem',
-        color: containerStyle.color,
-        fontSize: '0.875rem'
+        color: '#92400e',
+        fontSize: '0.875rem',
+        ...style,
       }}
     >
-      <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>
-        <span aria-hidden="true">⚠️ </span>Warnings:
+      <div
+        className="bw-warning-list__title"
+        style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}
+      >
+        ⚠️ Warnings:
       </div>
-      <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
-        {items.map((warning, idx) => {
-          if (isHighRiskWarningCode(warning.code)) {
-            const style = WARNING_STYLES[warning.code];
-            return (
-              <li key={idx} style={{ marginBottom: '0.5rem', color: style.color }}>
-                <WarningBadge code={warning.code} />
-                <div style={{ marginTop: '0.25rem' }}>{style.advice}</div>
-                {warning.message && warning.message !== style.advice && (
-                  <div style={{ marginTop: '0.125rem', fontSize: '0.75rem', opacity: 0.85 }}>
-                    {warning.message}
-                  </div>
-                )}
-              </li>
-            );
-          }
-          return (
-            <li key={idx} style={{ marginBottom: '0.25rem' }}>
-              {warning.message ?? warning.code}
-            </li>
-          );
-        })}
+      <ul className="bw-warning-list__items" style={{ margin: 0, paddingLeft: '1.25rem' }}>
+        {warnings.map((warning, idx) => (
+          <li
+            key={idx}
+            className="bw-warning-item"
+            style={{ marginBottom: '0.25rem' }}
+          >
+            {warning}
+          </li>
+        ))}
       </ul>
     </div>
   );

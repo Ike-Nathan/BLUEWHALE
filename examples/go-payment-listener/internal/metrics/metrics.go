@@ -1,8 +1,10 @@
 package metrics
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -31,7 +33,21 @@ func Register() {
 	prometheus.MustRegister(RoutingSourceTotal)
 }
 
+// healthzHandler returns 200 OK with a JSON body as long as the process is running.
+// Orchestrators (Kubernetes, ECS, Docker Compose) use this endpoint to gate traffic
+// and restart unhealthy containers.
+func healthzHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]string{
+		"status": "ok",
+		"time":   time.Now().UTC().Format(time.RFC3339),
+	})
+}
+
 func Serve(port int) error {
-	http.Handle("/metrics", promhttp.Handler())
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+	mux.HandleFunc("/healthz", healthzHandler)
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), mux)
 }

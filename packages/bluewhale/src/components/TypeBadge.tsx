@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 
 export type AddressType = 'G' | 'M' | 'C' | 'UNKNOWN';
 
@@ -67,14 +67,13 @@ export const WarningBadge: React.FC<WarningBadgeProps> = ({ code }) => {
 
 interface TypeBadgeProps {
   type: AddressType;
-  /**
-   * Warning codes for the current address. CONTRACT_SENDER_DETECTED turns the
-   * badge red and MISSING_REQUIRED_MEMO turns it amber (red wins if both).
-   */
-  warningCodes?: string[];
+  /** Additional CSS class names merged onto the root element. */
+  className?: string;
+  /** Inline styles applied to the root element. */
+  style?: CSSProperties;
 }
 
-export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, warningCodes = [] }) => {
+export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, className, style }) => {
   if (type === 'UNKNOWN') return null;
 
   let backgroundColor = '#e2e8f0'; // default gray
@@ -95,21 +94,13 @@ export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, warningCodes = [] })
       break;
   }
 
-  const riskCode: HighRiskWarningCode | undefined = warningCodes.includes('CONTRACT_SENDER_DETECTED')
-    ? 'CONTRACT_SENDER_DETECTED'
-    : warningCodes.includes('MISSING_REQUIRED_MEMO')
-      ? 'MISSING_REQUIRED_MEMO'
-      : undefined;
-
-  let title = `${type}-address`;
-  if (riskCode) {
-    backgroundColor = WARNING_STYLES[riskCode].backgroundColor;
-    color = WARNING_STYLES[riskCode].color;
-    title += ` – ${WARNING_STYLES[riskCode].label}`;
-  }
+  const rootClass = ['bw-type-badge', `bw-type-badge--${type.toLowerCase()}`, className]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div
+      className={rootClass}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -123,7 +114,7 @@ export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, warningCodes = [] })
         marginRight: '0.5rem',
         minWidth: '2rem',
         userSelect: 'none',
-        boxShadow: riskCode ? `0 0 0 2px ${WARNING_STYLES[riskCode].borderColor}` : undefined
+        ...style,
       }}
       title={title}
     >
