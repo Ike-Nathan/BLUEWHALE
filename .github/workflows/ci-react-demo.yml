@@ -1,0 +1,38 @@
+name: ci-react-demo
+
+on:
+  pull_request:
+    paths:
+      - "examples/react-demo/**"
+      - "packages/bluewhale/**"
+      - ".github/workflows/ci-react-demo.yml"
+
+concurrency:
+  group: ci-react-demo-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: React Demo – TypeScript & Vite build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/react-demo
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: examples/react-demo/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript compile + Vite build
+        run: npm run build

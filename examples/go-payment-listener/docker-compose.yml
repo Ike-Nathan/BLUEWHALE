@@ -9,6 +9,12 @@ services:
       - HORIZON_TARGET_ACCOUNT=${TARGET_ACCOUNT:-GA7QYNF7SOWQ3GLR2B6RS22TBGZAOR6KLYH4PA5ZAM73A3H4K2HZZSQU}
     ports:
       - "9090:9090"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:9090/healthz"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
 
   prometheus:
     image: prom/prometheus:latest

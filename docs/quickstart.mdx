@@ -46,3 +46,26 @@ print(result.routingId); // "123"
 ```
 
 </CodeGroup>
+
+## Try It Live
+
+Experiment with address validation and deposit routing directly in your browser — no cloning required. The sandbox below is pre-configured with `@redishfish/bluewhale-core` and includes an interactive address input so you can test any G, M, or C address instantly.
+
+<iframe
+  src="https://stackblitz.com/edit/bluewhale-core-quickstart?embed=1&file=index.ts&hideNavigation=1&theme=dark&devToolsHeight=40"
+  style={{ width: "100%", height: "500px", border: "none", borderRadius: "8px" }}
+  title="Bluewhale Core – Interactive Quickstart"
+  allow="cross-origin-isolated"
+/>
+
+<Info>
+  The sandbox uses the published `@redishfish/bluewhale-core` package from npm. Any address you type into the input field is processed entirely client-side — nothing is sent to a server.
+</Info>
+
+### What to try
+
+- **M-address**: `MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBAAAAAAAAAAAAABQD` — extracts `routingId: "123"` with no warnings.
+- **G-address + numeric text memo**: Pass `memoType: "TEXT"` and `memoValue: "99"` alongside a G-address to see the `MEMO_TYPE_MISMATCH` warning.
+- **C-address**: Any `C...` address returns `destinationError: "INVALID_DESTINATION"`.
+
+If you prefer CodeSandbox, the same template is available at [codesandbox.io/s/bluewhale-core-quickstart](https://codesandbox.io/s/bluewhale-core-quickstart).
