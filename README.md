@@ -3,9 +3,12 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.0.1-blue?style=for-the-badge" alt="Version 1.0.1" />
+  <img src="https://img.shields.io/badge/Version-1.2.0-blue?style=for-the-badge" alt="Version 1.2.0" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License MIT" />
   <img src="https://img.shields.io/badge/Documentation-Live-blue?style=for-the-badge&logo=gitbook&logoColor=white" alt="Docs" />
+  <a href="https://codecov.io/gh/REDISHFISH/BLUEWHALE">
+    <img src="https://codecov.io/gh/REDISHFISH/BLUEWHALE/graph/badge.svg" alt="Coverage" />
+  </a>
 </p>
 
 **Bluewhale** is a specialized, multi-language library designed to solve the complexity of deposit routing on the Stellar network. It provides a unified, spec-compliant way to handle G-addresses (classic), M-addresses (muxed), and C-addresses (contracts) across TypeScript, Go, and Dart.
@@ -39,9 +42,14 @@ For full technical specifications, architecture deep-dives, and API references, 
 | Platform           | Package               | Install                                                              |
 | ------------------ | --------------------- | -------------------------------------------------------------------- |
 | **TypeScript**     | `@redishfish/bluewhale-core` | `npm install @redishfish/bluewhale-core`                                    |
+| **React UI**       | `@redishfish/bluewhale` | `npm install @redishfish/bluewhale`                                  |
 | **Go**             | `core-go`             | `go get github.com/REDISHFISH/BLUEWHALE/packages/core-go` |
 | **Dart / Flutter** | `bluewhale_core` | `dart pub add bluewhale_core`                                   |
 | **React (UI)**     | `@redishfish/bluewhale` | `npm install @redishfish/bluewhale`                                |
+
+### UI Component Styling
+
+The `@redishfish/bluewhale` React package exposes stable BEM class names (e.g. `bw-address-input`, `bw-type-badge`, `bw-warning-item`) so you can override styles with plain CSS, Tailwind, or any CSS-in-JS solution. Every component also accepts `className` and `style` props for direct overrides. See the [packages/bluewhale README](packages/bluewhale/README.md) for the full class reference and dark mode example.
 
 ## Quick Example
 

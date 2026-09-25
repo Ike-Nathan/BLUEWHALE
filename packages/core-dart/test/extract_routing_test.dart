@@ -6,6 +6,52 @@ void main() {
   const muxedAddress =
       'MAYCUYT553C5LHVE2XPW5GMEJT4BXGM7AHMJWLAPZP53KJO7EIQACABAAAAAAAAAAEVIG';
 
+  group('contract sender (C... source account)', () {
+    const contractSource =
+        'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
+
+    void expectContractSenderCleared(RoutingResult result) {
+      expect(result.destinationBaseAccount, isNull);
+      expect(result.id, isNull);
+      expect(result.source, RoutingSource.none);
+      expect(result.destinationError, isNull);
+      expect(result.warnings, hasLength(1));
+      expect(result.warnings.first.code, WarningCode.contractSenderDetected);
+      expect(result.warnings.first.code, 'CONTRACT_SENDER_DETECTED');
+      expect(result.warnings.first.severity, 'info');
+      expect(result.warnings.first.message,
+          'Contract source detected. Routing state cleared.');
+    }
+
+    test('clears routing state for a G destination with a memo', () {
+      expectContractSenderCleared(extractRoutingSync(RoutingInput(
+        destination: baseG,
+        memoType: 'id',
+        memoValue: '100',
+        sourceAccount: contractSource,
+      )));
+    });
+
+    test('clears routing state for an M destination', () {
+      expectContractSenderCleared(extractRoutingSync(RoutingInput(
+        destination: muxedAddress,
+        memoType: 'none',
+        sourceAccount: contractSource,
+      )));
+    });
+
+    test('does not trigger for a G source account', () {
+      final result = extractRoutingSync(RoutingInput(
+        destination: baseG,
+        memoType: 'id',
+        memoValue: '100',
+        sourceAccount: baseG,
+      ));
+      expect(result.source, RoutingSource.memo);
+      expect(result.id, BigInt.from(100));
+    });
+  });
+
   group('extractRoutingSync', () {
     test('decodes muxed routing when no external memo is present', () {
       final result = extractRoutingSync(
