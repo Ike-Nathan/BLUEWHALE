@@ -1,0 +1,238 @@
+---
+title: "QR Codes & Deeplink Routing"
+description: "Parsing Stellar payment URIs from QR codes and mobile deeplinks using extractRoutingFromURI."
+---
+
+Mobile wallets and QR scanners commonly encode Stellar payment requests as `web+stellar:` URIs. `extractRoutingFromURI` parses these URIs and applies the same routing logic as `extractRouting`, giving you a single, safe entry point for address resolution regardless of how the address arrived.
+
+## Supported URI Format
+
+The library follows [SEP-0007](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0007.md) (`web+stellar:pay`):
+
+```
+web+stellar:pay?destination=<address>&memo=<value>&memo_type=<type>&amount=<amount>&asset_code=<code>&asset_issuer=<issuer>
+```
+
+### Parameters
+
+| Parameter | Required | Description |
+|---|---|---|
+| `destination` | Yes | G-address, M-address, or C-address of the payment recipient |
+| `memo` | No | Memo value (decimal string for `MEMO_ID`, text for `MEMO_TEXT`) |
+| `memo_type` | No | `MEMO_ID`, `MEMO_TEXT`, `MEMO_HASH`, or `MEMO_RETURN`. Defaults to `MEMO_TEXT` when `memo` is present. |
+| `amount` | No | Decimal amount string (e.g., `"10.50"`) |
+| `asset_code` | No | Asset code (e.g., `"USDC"`). Defaults to native XLM when absent. |
+| `asset_issuer` | No | Issuer G-address for non-native assets |
+
+### Error Codes
+
+| Code | Meaning |
+|---|---|
+| `INVALID_URI_SCHEME` | URI does not start with `web+stellar:pay` |
+| `MISSING_DESTINATION` | The `destination` parameter is absent |
+| `INVALID_DESTINATION` | Destination address failed checksum or type validation |
+| `INVALID_MEMO_TYPE` | `memo_type` value is not one of the four recognized types |
+| `MEMO_VALUE_REQUIRED` | `memo_type` is set but `memo` is absent |
+
+Routing-level warnings (`NON_CANONICAL_ROUTING_ID`, `MEMO_PRESENT_WITH_MUXED`, `CONTRACT_SENDER_DETECTED`, etc.) are the same as those documented in the [`extractRouting` API reference](/docs/api-reference/extract-routing).
+
+---
+
+## TypeScript
+
+```typescript
+import { extractRoutingFromURI } from "@redishfish/bluewhale-core";
+
+// Scanned from a QR code or received via a deeplink intent
+const uri =
+  "web+stellar:pay?destination=MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBAAAAAAAAAAAAABQD&amount=10.50&asset_code=USDC&asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN";
+
+const result = extractRoutingFromURI(uri);
+
+if (result.error) {
+  // Fatal parse error — reject the QR scan
+  console.error("Invalid payment URI:", result.error.code, result.error.message);
+  return;
+}
+
+if (result.warnings.length > 0) {
+  // Non-fatal compliance signals
+  for (const w of result.warnings) {
+    console.warn(`[${w.severity.toUpperCase()}] ${w.code}: ${w.message}`);
+  }
+}
+
+// Safe to proceed
+console.log("Pay to:", result.address);       // Base G-address
+console.log("Routing ID:", result.routingId); // Decimal string, or null
+console.log("Amount:", result.amount);        // "10.50"
+console.log("Asset:", result.assetCode);      // "USDC"
+```
+
+### React — Deeplink Handler
+
+```typescript
+import { useEffect } from "react";
+import { extractRoutingFromURI } from "@redishfish/bluewhale-core";
+
+function useDeeplinkHandler(onPayment: (result: RoutingResult) => void) {
+  useEffect(() => {
+    const handler = (event: CustomEvent<string>) => {
+      const result = extractRoutingFromURI(event.detail);
+      if (!result.error) {
+        onPayment(result);
+      }
+    };
+
+    window.addEventListener("stellar-deeplink", handler as EventListener);
+    return () => window.removeEventListener("stellar-deeplink", handler as EventListener);
+  }, [onPayment]);
+}
+```
+
+---
+
+## Dart
+
+```dart
+import 'package:bluewhale_core/bluewhale_core.dart';
+
+void handleScannedQr(String rawUri) {
+  final result = extractRoutingFromURI(rawUri);
+
+  if (result.error != null) {
+    // Fatal — show error UI
+    print('Invalid QR code: ${result.error!.code} — ${result.error!.message}');
+    return;
+  }
+
+  for (final warning in result.warnings) {
+    print('[${warning.severity.name.toUpperCase()}] ${warning.code}: ${warning.message}');
+  }
+
+  print('Destination: ${result.address}');
+  print('Routing ID: ${result.routingId}');
+
+  // BigInt-safe access on Flutter Web
+  if (result.safeId != null) {
+    print('Safe ID: ${result.safeId!.value}'); // Exact string representation
+  }
+}
+```
+
+### Flutter — QR Scanner Integration
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:bluewhale_core/bluewhale_core.dart';
+
+class QrScannerScreen extends StatelessWidget {
+  const QrScannerScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MobileScanner(
+      onDetect: (capture) {
+        final barcode = capture.barcodes.first;
+        final rawUri = barcode.rawValue;
+        if (rawUri == null) return;
+
+        final result = extractRoutingFromURI(rawUri);
+
+        if (result.error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Invalid QR: ${result.error!.code}')),
+          );
+          return;
+        }
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ConfirmPaymentScreen(routingResult: result),
+          ),
+        );
+      },
+    );
+  }
+}
+```
+
+---
+
+## Go
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+
+    addresskit "github.com/progidyken-hub/BLUEWHALE/packages/core-go/routing"
+)
+
+func handleQRScan(rawURI string) {
+    result, err := addresskit.ExtractRoutingFromURI(rawURI)
+    if err != nil {
+        // Fatal parse error — reject the scan
+        log.Printf("Invalid payment URI: %v", err)
+        return
+    }
+
+    for _, w := range result.Warnings {
+        log.Printf("[%s] %s: %s", w.Severity, w.Code, w.Message)
+    }
+
+    fmt.Printf("Destination:  %s\n", result.Address)
+    fmt.Printf("Routing ID:   %s\n", result.RoutingId)
+    fmt.Printf("Amount:       %s\n", result.Amount)
+    fmt.Printf("Asset:        %s\n", result.AssetCode)
+}
+
+func main() {
+    uri := "web+stellar:pay?destination=GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBVQQNHNMGDPZAQ6BXQFN33&memo=12345&memo_type=MEMO_ID&amount=25.00"
+    handleQRScan(uri)
+}
+```
+
+---
+
+## Common Scenarios
+
+### M-address in QR (no memo needed)
+
+```
+web+stellar:pay?destination=MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBAAAAAAAAAAAAABQD&amount=50.00
+```
+
+`extractRoutingFromURI` resolves the muxed ID embedded in the M-address. No `memo` parameter is required. If a `memo` is also present, a `MEMO_PRESENT_WITH_MUXED` warning is emitted.
+
+### G-address with Memo ID
+
+```
+web+stellar:pay?destination=GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBVQQNHNMGDPZAQ6BXQFN33&memo=99123&memo_type=MEMO_ID
+```
+
+`routingId` will be `"99123"` and `routingSource` will be `"memo"`.
+
+### Contract address (reject)
+
+```
+web+stellar:pay?destination=CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLT7AV7Y6S33Z6S3CHBQQQQQQQQQQQQQQYND6EP&amount=10.00
+```
+
+Returns `error.code === "INVALID_DESTINATION"`. Never route funds to a C-address from a standard payment flow.
+
+<Warning>
+  Always check `result.error` before using any other field. An error means the URI is structurally invalid and the destination should not be trusted.
+</Warning>
+
+---
+
+## Related
+
+- [extractRouting API Reference](/docs/api-reference/extract-routing) — routing logic applied after URI parsing
+- [Flutter Web: BigInt](/docs/guides/flutter-web-bigint) — precision safety for large muxed IDs on the web
+- [Flutter: Incoming Payments](/docs/guides/flutter-incoming-payments) — handling payments received by your wallet
+- [Address Types](/docs/concepts/address-types) — G, M, and C address semantics
