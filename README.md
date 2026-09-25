@@ -35,6 +35,7 @@ For full technical specifications, architecture deep-dives, and API references, 
 - **[Routing Logic](https://bluewhale.mintlify.app/docs/concepts/routing-logic)**: Complete reference of all routing scenarios.
 - **[Common Mistakes](https://bluewhale.mintlify.app/docs/common-mistakes)**: Avoid the 6 most common integration pitfalls.
 - **[Language Guides](https://bluewhale.mintlify.app/docs/guides/go-deposit-routing)**: Specialized guides for Go, TypeScript, and Flutter.
+- **[React UI Guide](https://bluewhale.mintlify.app/docs/guides/react-address-input)**: Drop-in address input components for React apps.
 
 ## Packages
 
@@ -44,6 +45,7 @@ For full technical specifications, architecture deep-dives, and API references, 
 | **React UI**       | `@redishfish/bluewhale` | `npm install @redishfish/bluewhale`                                  |
 | **Go**             | `core-go`             | `go get github.com/REDISHFISH/BLUEWHALE/packages/core-go` |
 | **Dart / Flutter** | `bluewhale_core` | `dart pub add bluewhale_core`                                   |
+| **React (UI)**     | `@redishfish/bluewhale` | `npm install @redishfish/bluewhale`                                |
 
 ### UI Component Styling
 
@@ -66,12 +68,30 @@ console.log(result.address); // "GA7Q..."
 console.log(result.routingId); // "123"
 ```
 
-## Core Features
+## React UI Components
 
-- **Spec-First Design**: Guaranteed identical behavior across all three languages via a shared test vector suite.
-- **Precision Safety**: Built-in protection against 64-bit integer precision loss in JavaScript and Flutter Web.
-- **Warning System**: Discriminated unions (TS) or structured objects (Go/Dart) to catch edge cases like numeric `MEMO_TEXT`.
-- **Zero Dependencies**: Core logic is lightweight and has zero external dependencies beyond standard library features.
+`@redishfish/bluewhale` ships ready-made React components for wallet and exchange address forms: an address input with a live G/M/C type badge, a memo field that only appears when a memo is meaningful, and inline warnings (e.g. for contract addresses).
+
+```bash
+npm install @redishfish/bluewhale react
+```
+
+```tsx
+import { AddressInput } from "@redishfish/bluewhale";
+
+export function WithdrawForm() {
+  return (
+    <form>
+      <label>Destination</label>
+      {/* Detects G/M/C addresses, shows a memo field for G-addresses,
+          and warns when a contract (C) address is entered. */}
+      <AddressInput />
+    </form>
+  );
+}
+```
+
+The building blocks (`TypeBadge`, `MemoField`, `WarningList`) are also exported for custom layouts. See the [React UI Guide](https://bluewhale.mintlify.app/docs/guides/react-address-input) for details.
 
 ## License
 
