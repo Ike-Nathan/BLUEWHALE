@@ -1,6 +1,7 @@
 package routing
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -359,4 +360,89 @@ func routingIDEqual(a, b *RoutingID) bool {
 		return false
 	}
 	return a.String() == b.String()
+}
+
+// ─── Issue #48: context.Context support ──────────────────────────────────────
+
+func TestExtractRoutingWithContext_MemoRequired(t *testing.T) {
+	fetcher := func(_ context.Context, _ string) (bool, error) {
+		return true, nil
+	}
+
+	result := ExtractRoutingWithContext(context.Background(), RoutingInput{
+		Destination: testBaseG,
+		MemoType:    "none",
+	}, fetcher)
+
+	if len(result.Warnings) == 0 {
+		t.Fatal("expected at least one warning for missing required memo")
+	}
+
+	last := result.Warnings[len(result.Warnings)-1]
+	if last.Code != address.WarnMissingRequiredMemo {
+		t.Errorf("last warning code = %v, want %v", last.Code, address.WarnMissingRequiredMemo)
+	}
+}
+
+func TestExtractRoutingWithContext_CancelledContextFailsOpen(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // cancel immediately
+
+	// The fetcher simulates a slow Horizon call that checks ctx.Err().
+	fetcher := func(ctx context.Context, _ string) (bool, error) {
+		if ctx.Err() != nil {
+			return false, ctx.Err()
+		}
+		return true, nil
+	}
+
+	result := ExtractRoutingWithContext(ctx, RoutingInput{
+		Destination: testBaseG,
+		MemoType:    "none",
+	}, fetcher)
+
+	// Cancelled context must fail open: no WarnMissingRequiredMemo should appear.
+	for _, w := range result.Warnings {
+		if w.Code == address.WarnMissingRequiredMemo {
+			t.Error("cancelled context should not add WarnMissingRequiredMemo (must fail open)")
+		}
+	}
+
+	// Synchronous routing result is still intact.
+	if result.DestinationBaseAccount != testBaseG {
+		t.Errorf("DestinationBaseAccount = %v, want %v", result.DestinationBaseAccount, testBaseG)
+	}
+}
+
+func TestExtractRoutingWithContext_NilFetcherNoOp(t *testing.T) {
+	result := ExtractRoutingWithContext(context.Background(), RoutingInput{
+		Destination: testBaseG,
+		MemoType:    "none",
+	}, nil)
+
+	assertRoutingResult(t, result, RoutingResult{
+		DestinationBaseAccount: testBaseG,
+		RoutingID:              nil,
+		RoutingSource:          "none",
+		Warnings:               []address.Warning{},
+	})
+}
+
+func TestExtractRoutingWithMemoRequirement_BackwardCompatible(t *testing.T) {
+	// Ensure the deprecated wrapper still works as before.
+	fetcher := func(_ string) (bool, error) { return true, nil }
+
+	result := ExtractRoutingWithMemoRequirement(RoutingInput{
+		Destination: testBaseG,
+		MemoType:    "none",
+	}, fetcher)
+
+	if len(result.Warnings) == 0 {
+		t.Fatal("expected at least one warning for missing required memo (backward-compat)")
+	}
+
+	last := result.Warnings[len(result.Warnings)-1]
+	if last.Code != address.WarnMissingRequiredMemo {
+		t.Errorf("last warning code = %v, want %v", last.Code, address.WarnMissingRequiredMemo)
+	}
 }
