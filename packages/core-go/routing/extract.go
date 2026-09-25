@@ -1,6 +1,7 @@
 package routing
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
@@ -216,7 +217,12 @@ type MemoRequirementFetcher func(baseAccount string) (bool, error)
 // optionally adds the SEP-0029 error when a classic destination requires a
 // memo but no routing ID was supplied. Fetch failures fail open so callers
 // retain the result of the synchronous parser.
-func ExtractRoutingWithMemoRequirement(input RoutingInput, fetch MemoRequirementFetcher) RoutingResult {
+//
+// The ctx parameter is accepted for API consistency with context-aware
+// call chains (e.g. future fetcher implementations backed by Horizon or an
+// indexer); the current implementation performs no cancellable work and
+// does not use it.
+func ExtractRoutingWithMemoRequirement(ctx context.Context, input RoutingInput, fetch MemoRequirementFetcher) RoutingResult {
 	result := ExtractRouting(input)
 	if fetch == nil || result.DestinationBaseAccount == "" || result.RoutingID != nil || result.DestinationError != nil {
 		return result

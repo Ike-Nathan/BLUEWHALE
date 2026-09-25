@@ -3,9 +3,5 @@
   "version": "0.1.0",
   "description": "Bluewhale – monorepo",
   "private": true,
-  "scripts": {
-    "spec:validate": "node spec/validate.js",
-    "spec:sync-check": "node scripts/check-vectors-sync.js",
-    "fuzz:differential": "node scripts/differential-fuzz.js"
-  }
+  "packageManager": "pnpm@9.15.9"
 }
