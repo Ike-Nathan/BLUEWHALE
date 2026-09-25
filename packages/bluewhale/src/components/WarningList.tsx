@@ -19,8 +19,8 @@ export const WarningList: React.FC<WarningListProps> = ({ warnings, className, s
       style={{
         marginTop: '0.5rem',
         padding: '0.75rem',
-        backgroundColor: '#fffbeb',
-        border: '1px solid #fde68a',
+        backgroundColor: containerStyle.backgroundColor,
+        border: `1px solid ${containerStyle.borderColor}`,
         borderRadius: '0.375rem',
         color: '#92400e',
         fontSize: '0.875rem',

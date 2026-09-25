@@ -6,13 +6,28 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": ["dist"],
+  "sideEffects": false,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
     "ladle": "ladle serve",
     "build-storybook": "ladle build"
+  },
+  "dependencies": {
+    "@redishfish/bluewhale-core": "workspace:^"
   },
   "peerDependencies": {
     "react": ">=17.0.0"
