@@ -30,6 +30,30 @@ enum RoutingSource {
   }
 }
 
+/// Severity levels for routing warnings, ordered from least to most severe.
+///
+/// Used with [RoutingInput.minSeverityLevel] to filter warnings by importance.
+enum WarningSeverity {
+  /// Informational notice; no action required.
+  info,
+
+  /// Potential problem that may need attention.
+  warn,
+
+  /// Serious problem; the payment should not be credited automatically.
+  error;
+
+  /// Parses a wire severity string (`info`, `warn`, `error`).
+  ///
+  /// Returns `null` for unrecognized values.
+  static WarningSeverity? tryParse(String value) {
+    for (final s in WarningSeverity.values) {
+      if (s.name == value) return s;
+    }
+    return null;
+  }
+}
+
 /// Represents a non-blocking notification emitted during routing resolution.
 class RoutingWarning {
   /// The unique code identifying the warning type.
@@ -67,6 +91,18 @@ class RoutingWarning {
     severity: 'error',
     message: 'Destination account requires a memo, but no routing ID was provided.',
   );
+
+  /// Emitted when the destination is a contract (C) address, which cannot
+  /// receive classic payments.
+  static const invalidDestination = RoutingWarning(
+    code: 'INVALID_DESTINATION',
+    severity: 'error',
+    message: 'C address is not a valid destination',
+  );
+
+  /// The parsed [WarningSeverity] of this warning, or `null` if [severity]
+  /// is not a recognized level.
+  WarningSeverity? get severityLevel => WarningSeverity.tryParse(severity);
 
   @override
   String toString() => '[$severity] $code: $message';

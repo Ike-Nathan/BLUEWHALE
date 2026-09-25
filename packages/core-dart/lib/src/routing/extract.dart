@@ -41,10 +41,16 @@ RoutingResult _extractRoutingUnfiltered(RoutingInput input) {
     throw const ExtractRoutingException('Invalid input: destination must be a non-empty string.');
   }
 
-  final prefix = trimmed[0].toUpperCase();
-  if (prefix != 'G' && prefix != 'M') {
-    throw ExtractRoutingException(
-      'Invalid destination: expected a G or M address, got "${input.destination}".',
+  final parsed = parse(input.destination);
+
+  if (parsed.kind == codes.AddressKind.c) {
+    return RoutingResult(
+      source: RoutingSource.none,
+      warnings: [
+        for (final w in parsed.warnings)
+          RoutingWarning(code: w.code, severity: w.severity, message: w.message),
+        RoutingWarning.invalidDestination,
+      ],
     );
   }
 
@@ -61,8 +67,6 @@ RoutingResult _extractRoutingUnfiltered(RoutingInput input) {
       // Ignore source account parsing errors for routing extraction
     }
   }
-
-  final parsed = parse(input.destination);
 
   if (parsed.kind == null) {
     return RoutingResult(
@@ -267,13 +271,14 @@ Future<RoutingResult> extractRouting(
 
   try {
     if (await fetchMemoRequirement(result.destinationBaseAccount!)) {
-      return RoutingResult(
+      final withMemoWarning = RoutingResult(
         source: result.source,
         id: result.id,
         destinationBaseAccount: result.destinationBaseAccount,
         destinationError: result.destinationError,
         warnings: [...result.warnings, RoutingWarning.missingRequiredMemo],
       );
+      return _filterBySeverity(withMemoWarning, input.minSeverityLevel);
     }
   } catch (_) {
     // Network/configuration failures must not change the synchronous result.
