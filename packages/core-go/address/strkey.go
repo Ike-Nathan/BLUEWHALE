@@ -21,7 +21,8 @@ func DecodeStrKey(address string) (versionByte byte, payload []byte, err error) 
 		return 0, nil, ErrInvalidLengthError
 	}
 
-	// Convert to uppercase for base32 decoding.
+	// Convert to uppercase for base32 decoding. DecodeStrKey only validates;
+	// Parse reports case normalization via WarnNonCanonicalAddress.
 	address = strings.ToUpper(address)
 
 	// Check basic length constraints.

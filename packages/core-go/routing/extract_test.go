@@ -2,6 +2,7 @@ package routing
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/REDISHFISH/BLUEWHALE/packages/core-go/address"
@@ -328,6 +329,135 @@ func TestExtractRouting_ContractSourceClearsRoutingState(t *testing.T) {
 		}
 
 		assertRoutingResult(t, result, expected)
+	})
+}
+
+func TestExtractRouting_ContractSenderDetection(t *testing.T) {
+	contractAddress, err := address.EncodeStrKey(address.VersionByteC, make([]byte, 32))
+	if err != nil {
+		t.Fatalf("failed to generate contract address: %v", err)
+	}
+
+	contractSenderResult := RoutingResult{
+		RoutingSource: "none",
+		Warnings: []address.Warning{{
+			Code:     address.WarnContractSenderDetected,
+			Severity: "info",
+			Message:  "Contract source detected. Routing state cleared.",
+		}},
+	}
+
+	t.Run("contract source clears routing state", func(t *testing.T) {
+		tests := []struct {
+			name  string
+			input RoutingInput
+		}{
+			{
+				name: "G destination with MEMO_ID",
+				input: RoutingInput{
+					Destination:   testBaseG,
+					MemoType:      "id",
+					MemoValue:     "100",
+					SourceAccount: contractAddress,
+				},
+			},
+			{
+				name: "G destination without memo",
+				input: RoutingInput{
+					Destination:   testBaseG,
+					MemoType:      "none",
+					SourceAccount: contractAddress,
+				},
+			},
+			{
+				name: "M destination",
+				input: RoutingInput{
+					Destination:   testMuxed,
+					MemoType:      "none",
+					SourceAccount: contractAddress,
+				},
+			},
+			{
+				name: "lowercase contract source",
+				input: RoutingInput{
+					Destination:   testBaseG,
+					MemoType:      "id",
+					MemoValue:     "100",
+					SourceAccount: strings.ToLower(contractAddress),
+				},
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				assertRoutingResult(t, ExtractRouting(tt.input), contractSenderResult)
+			})
+		}
+	})
+
+	t.Run("non-contract source proceeds normally", func(t *testing.T) {
+		memoRouted := RoutingResult{
+			DestinationBaseAccount: testBaseG,
+			RoutingID:              NewRoutingID("100"),
+			RoutingSource:          "memo",
+			Warnings:               []address.Warning{},
+		}
+
+		tests := []struct {
+			name     string
+			input    RoutingInput
+			expected RoutingResult
+		}{
+			{
+				name: "G source routes via memo",
+				input: RoutingInput{
+					Destination:   testBaseG,
+					MemoType:      "id",
+					MemoValue:     "100",
+					SourceAccount: testBaseG,
+				},
+				expected: memoRouted,
+			},
+			{
+				name: "M source routes via muxed destination",
+				input: RoutingInput{
+					Destination:   testMuxed,
+					MemoType:      "none",
+					SourceAccount: testMuxed,
+				},
+				expected: RoutingResult{
+					DestinationBaseAccount: testBaseG,
+					RoutingID:              NewRoutingID("9007199254740993"),
+					RoutingSource:          "muxed",
+					Warnings:               []address.Warning{},
+				},
+			},
+			{
+				name: "unparseable source is ignored",
+				input: RoutingInput{
+					Destination:   testBaseG,
+					MemoType:      "id",
+					MemoValue:     "100",
+					SourceAccount: "not-an-address",
+				},
+				expected: memoRouted,
+			},
+			{
+				name: "empty source is ignored",
+				input: RoutingInput{
+					Destination: testBaseG,
+					MemoType:    "id",
+					MemoValue:   "100",
+				},
+				expected: memoRouted,
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				assertRoutingResult(t, ExtractRouting(tt.input), tt.expected)
+			})
+		}
 	})
 }
 
