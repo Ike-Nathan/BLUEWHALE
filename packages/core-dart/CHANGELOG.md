@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+- **Breaking:** `extractRoutingSync` / `extractRouting` no longer throw
+  `ExtractRoutingException` for contract (C) destinations. They now return a
+  `RoutingResult` with `RoutingSource.none` and
+  `RoutingWarning.invalidDestination` (`INVALID_DESTINATION`, severity
+  `error`), matching the TypeScript and Go implementations. Destinations with
+  an unknown prefix now return a `destinationError` instead of throwing.
+  Empty destinations still throw.
+- Added `WarningSeverity` and `RoutingInput.minSeverityLevel` to filter
+  returned warnings by severity (`info` < `warn` < `error`).
+- Added SEP-0007 URI parsing: `extractRoutingFromUri(Uri)` and
+  `extractRoutingFromUriString(String)` parse `web+stellar:pay` QR codes and
+  deeplinks into a `UriRoutingResult` without throwing.
+
 ## 1.1.0
 
 - **Flutter Web precision safety for 64-bit routing IDs.**

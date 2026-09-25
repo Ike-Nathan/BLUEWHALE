@@ -19,16 +19,52 @@ import 'safe_routing_id.dart';
 /// This is the synchronous variant for pure string parsing.
 /// For future compatibility with async network checks (Federation, SEP-0029),
 /// use [extractRouting] instead.
+///
+/// Contract (C) destinations do not throw: they return a [RoutingResult]
+/// with [RoutingSource.none] and a [RoutingWarning.invalidDestination]
+/// warning. Warnings below [RoutingInput.minSeverityLevel] are omitted.
 RoutingResult extractRoutingSync(RoutingInput input) {
+  return _filterBySeverity(_extractRoutingSync(input), input.minSeverityLevel);
+}
+
+/// Returns [result] with warnings below [minSeverity] removed.
+///
+/// Warnings with an unrecognized severity string are always kept.
+RoutingResult _filterBySeverity(
+  RoutingResult result,
+  WarningSeverity? minSeverity,
+) {
+  if (minSeverity == null || minSeverity == WarningSeverity.info) {
+    return result;
+  }
+  return RoutingResult(
+    source: result.source,
+    id: result.id,
+    destinationBaseAccount: result.destinationBaseAccount,
+    destinationError: result.destinationError,
+    warnings: result.warnings.where((w) {
+      final level = w.severityLevel;
+      return level == null || level.index >= minSeverity.index;
+    }).toList(),
+  );
+}
+
+RoutingResult _extractRoutingSync(RoutingInput input) {
   final trimmed = input.destination.trim();
   if (trimmed.isEmpty) {
     throw const ExtractRoutingException('Invalid input: destination must be a non-empty string.');
   }
 
-  final prefix = trimmed[0].toUpperCase();
-  if (prefix != 'G' && prefix != 'M') {
-    throw ExtractRoutingException(
-      'Invalid destination: expected a G or M address, got "${input.destination}".',
+  final parsed = parse(input.destination);
+
+  if (parsed.kind == codes.AddressKind.c) {
+    return RoutingResult(
+      source: RoutingSource.none,
+      warnings: [
+        for (final w in parsed.warnings)
+          RoutingWarning(code: w.code, severity: w.severity, message: w.message),
+        RoutingWarning.invalidDestination,
+      ],
     );
   }
 
@@ -45,8 +81,6 @@ RoutingResult extractRoutingSync(RoutingInput input) {
       // Ignore source account parsing errors for routing extraction
     }
   }
-
-  final parsed = parse(input.destination);
 
   if (parsed.kind == null) {
     return RoutingResult(
@@ -251,13 +285,14 @@ Future<RoutingResult> extractRouting(
 
   try {
     if (await fetchMemoRequirement(result.destinationBaseAccount!)) {
-      return RoutingResult(
+      final withMemoWarning = RoutingResult(
         source: result.source,
         id: result.id,
         destinationBaseAccount: result.destinationBaseAccount,
         destinationError: result.destinationError,
         warnings: [...result.warnings, RoutingWarning.missingRequiredMemo],
       );
+      return _filterBySeverity(withMemoWarning, input.minSeverityLevel);
     }
   } catch (_) {
     // Network/configuration failures must not change the synchronous result.
