@@ -29,7 +29,11 @@ type RoutingResult struct {
 	DestinationError       *DestinationError `json:"destinationError,omitempty"`
 }
 
+// DestinationError is part of RoutingResult's wire schema. Both fields are
+// omitempty for the same reason RoutingResult.ErrorMessage is: a consumer of
+// the JSON should not have to distinguish "no message" from "empty message",
+// and an error that only carries a code should not advertise a blank string.
 type DestinationError struct {
-	Code    address.ErrorCode `json:"code"`
-	Message string            `json:"message"`
+	Code    address.ErrorCode `json:"code,omitempty"`
+	Message string            `json:"message,omitempty"`
 }
